@@ -111,6 +111,29 @@ RSpec.describe GovukElementsFormBuilder::FormBuilder do
 
   end
 
+  describe '#text_area' do
+    context 'when fields_for used' do
+      it 'outputs label and input with correct ids and hint text in span' do
+        resource.address = Address.new
+        output = builder.fields_for(:address) do |f|
+          f.text_area :address
+        end
+        expect_equal output, [
+          '<div class="form-group">',
+          '<label class="form-label" for="person_address_attributes_address">',
+          'Full address',
+          '<span class="form-hint">',
+          'Exclude postcode. For example, 102 Petty France, London',
+          '</span>',
+          '</label>',
+          '<textarea class="form-control" name="person[address_attributes][address]" id="person_address_attributes_address">',
+          '</textarea>',
+          '</div>'
+        ]
+      end
+    end
+  end
+
   describe '#email_field' do
     it 'outputs label and input wrapped in div' do
       output = builder.email_field :email_work

@@ -17,7 +17,12 @@ module GovukElementsFormBuilder
       super attribute, options.merge(builder: self.class)
     end
 
-    %w[text_field email_field password_field].each do |method_name|
+    %w[
+      email_field
+      password_field
+      text_area
+      text_field
+    ].each do |method_name|
       define_method(method_name) do |attribute, *args|
         content_tag :div, class: form_group_classes(attribute), id: form_group_id(attribute) do
           options = args.extract_options!

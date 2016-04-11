@@ -30,8 +30,12 @@ en:
         ni_number: National Insurance number
         password: Password
         password_confirmation: Confirm password
+      person[address_attributes]:
+        address: Full address
     hint:
       person:
         email_home: For eg. John.Smith@example.com
         ni_number: It’ll be on your last payslip. For example, JH 21 90 0A.
         password_confirmation: Password should match
+      person[address_attributes]:
+        address: Exclude postcode. For example, 102 Petty France, London
