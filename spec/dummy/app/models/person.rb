@@ -1,5 +1,6 @@
 class Person
   include ActiveModel::Model
+  GENDER = %w{ female male }
 
   attr_accessor :name
   validates_presence_of :name
@@ -9,6 +10,7 @@ class Person
   attr_accessor :email_home
   attr_accessor :password
   attr_accessor :password_confirmation
+  attr_accessor :gender
 
   attr_accessor :address
 

@@ -1,7 +1,7 @@
 module GovukElementsFormBuilder
   class FormBuilder < ActionView::Helpers::FormBuilder
 
-    delegate :content_tag, :tag, to: :@template
+    delegate :content_tag, :tag, :safe_join, :radio_button_tag, to: :@template
     delegate :errors, to: :@object
 
     def initialize *args
@@ -34,6 +34,26 @@ module GovukElementsFormBuilder
           (label + super(attribute, options.except(:label)) ).html_safe
         end
       end
+    end
+
+    def collection_radio_buttons(attribute, records, record_id, record_name)
+
+      content_tag(:h1, "Gender", class: 'heading-medium') +
+      content_tag(:fieldset,
+        content_tag(:legend, "Gender", class:'visuallyhidden') +
+        safe_join(records.map do | record |
+
+          element_id = "#{object_name}_#{attribute}_#{record.send(record_id)}"
+
+          label(attribute, class: "block-label") do | label |
+
+            radio_button_tag( "#{object_name}[#{attribute}][]", record.send(record_name) )
+            
+          end
+
+        end)
+      )
+      #.html_safe
     end
 
     private
