@@ -6,12 +6,22 @@ module GovukElementsErrorsHelper
   end
 
   def self.error_summary object, heading, description
-    return if object.errors.blank?
+    return unless errors_exist? object
     error_summary_div do
       error_summary_heading(heading) +
       error_summary_description(description) +
       error_summary_messages(object)
     end
+  end
+
+  def self.errors_exist? object
+    object.errors.present? ||
+      object.instance_variables.any? do |var|
+        field = var.to_s.sub('@','').to_sym
+        object.send(field) &&
+          object.send(field).respond_to?(:errors) &&
+          object.send(field).errors.present?
+      end
   end
 
   def self.error_summary_div &block
