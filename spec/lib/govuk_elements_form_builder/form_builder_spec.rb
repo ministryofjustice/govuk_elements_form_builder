@@ -222,4 +222,46 @@ RSpec.describe GovukElementsFormBuilder::FormBuilder do
     end
   end
 
+  describe '#radio_buttons' do
+    it 'outputs radio buttons and wrapped in labels' do
+      output = builder.collection_radio_buttons :gender, [["male", "male"] ,["female", "female"]], :first, :last
+
+      expect_equal output, [
+        '<h1 class="heading-medium">',
+        'Gender',
+        '</h1>',
+        '<fieldset>',
+        '<legend class="visuallyhidden">',
+        'Gender',
+        '</legend>',
+        '<label class="block-label" for="person_gender_male">',
+        '<input type="radio" value="male" name="person[gender]" id="person_gender_male" />',
+        'male',
+        '</label>',
+        '<label class="block-label" for="person_gender_female">',
+        '<input type="radio" value="female" name="person[gender]" id="person_gender_female" />',
+        'female',
+        '</label>',
+        '</fieldset>'
+      ]
+    end
+
+    context 'when hint text provided' do
+      it 'outputs hint text in span inside label' do
+        output = builder.password_field :password_confirmation
+        expect_equal output, [
+          '<div class="form-group">',
+          '<label class="form-label" for="person_password_confirmation">',
+          'Confirm password',
+          '<span class="form-hint">',
+          'Password should match',
+          '</span>',
+          '</label>',
+          '<input class="form-control" type="password" name="person[password_confirmation]" id="person_password_confirmation" />',
+          '</div>'
+        ]
+      end
+    end
+  end
+
 end
