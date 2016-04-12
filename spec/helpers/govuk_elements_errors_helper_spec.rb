@@ -45,7 +45,7 @@ RSpec.describe GovukElementsErrorsHelper, type: :helper do
           error_summary_description +
         '</p>' +
         '<ul class="error-summary-list">' +
-          '<li><a href="#error_person_name">Postcode can&#39;t be blank</a></li>' +
+          '<li><a href="#error_person_address_attributes_postcode">Postcode can&#39;t be blank</a></li>' +
         '</ul>' +
       '</div>')
     end

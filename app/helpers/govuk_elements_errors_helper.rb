@@ -10,7 +10,7 @@ module GovukElementsErrorsHelper
     error_summary_div do
       error_summary_heading(heading) +
       error_summary_description(description) +
-      error_summary_messages(object)
+      error_summary_list(object)
     end
   end
 
@@ -62,22 +62,37 @@ module GovukElementsErrorsHelper
     content_tag :p, text
   end
 
-  def self.error_summary_messages object
-    content_tag(:ul,
-        class: 'error-summary-list') do
-      prefix = object.class.name.underscore
+  def self.error_summary_list object
+    content_tag(:ul, class: 'error-summary-list') do
+      messages = error_summary_messages(object)
 
-      object.errors.keys.map do |attribute|
-        error_summary_message object, prefix, attribute
-      end.flatten.join('').html_safe
+      messages << children_with_errors(object).map do |o|
+        error_summary_messages(o, object)
+      end
+
+      messages.flatten.join('').html_safe
     end
   end
 
-  def self.error_summary_message object, prefix, attribute
+  def self.error_summary_messages object, parent=nil
+    object.errors.keys.map do |attribute|
+      error_summary_message object, attribute, parent
+    end
+  end
+
+  def self.error_summary_message object, attribute, parent
     messages = object.errors.full_messages_for attribute
     messages.map do |message|
-      content_tag(:li, content_tag(:a, message, href: "#error_#{prefix}_#{attribute}"))
+      content_tag(:li, content_tag(:a, message, href: link_to_error(object, attribute, parent)))
     end
+  end
+
+  def self.link_to_error object, attribute, parent
+    prefix = object.class.name.underscore
+    if parent
+      prefix = "#{parent.class.name.underscore}_#{prefix}_attributes"
+    end
+    "#error_#{prefix}_#{attribute}"
   end
 
   private_class_method :error_summary_div
