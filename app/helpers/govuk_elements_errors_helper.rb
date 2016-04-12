@@ -15,13 +15,28 @@ module GovukElementsErrorsHelper
   end
 
   def self.errors_exist? object
-    object.errors.present? ||
-      object.instance_variables.any? do |var|
-        field = var.to_s.sub('@','').to_sym
-        object.send(field) &&
-          object.send(field).respond_to?(:errors) &&
-          object.send(field).errors.present?
-      end
+    errors_present?(object) || child_errors_present?(object)
+  end
+
+  def self.child_errors_present? object
+    attributes(object).any? { |child| errors_present?(child) }
+  end
+
+  def self.attributes object
+    object.instance_variables.map { |var| instance_variable(object, var) }
+  end
+
+  def self.instance_variable object, var
+    field = var.to_s.sub('@','').to_sym
+    object.send(field)
+  end
+
+  def self.errors_present? object
+    object && object.respond_to?(:errors) && object.errors.present?
+  end
+
+  def self.children_with_errors object
+    attributes(object).select { |child| errors_present?(child) }
   end
 
   def self.error_summary_div &block
