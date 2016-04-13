@@ -59,8 +59,8 @@ module GovukElementsFormBuilder
 
     def add_error_to_label! html_tag
       field = html_tag[/for="([^"]+)"/, 1]
-      attribute = field.sub(@object_name.to_s + '_', '').to_sym
-      message = error_full_message_for attribute
+      object_attribute = object_attribute_for field
+      message = error_full_message_for object_attribute
       html_tag.sub!('</label',
         %'<span class="error-message" id="error_message_#{field}">#{message}</span></label')
     end
@@ -77,10 +77,8 @@ module GovukElementsFormBuilder
     end
 
     def error_full_message_for attribute
-      object_attribute = adjust_nested_object_attribute attribute
-      message = errors.full_messages_for(object_attribute).first
-      label = attribute.to_s.humanize.capitalize
-      message.sub!(label, label_text(attribute))
+      message = errors.full_messages_for(attribute).first
+      message.sub! default_label(attribute), localized_label(attribute)
       message
     end
 
@@ -88,18 +86,10 @@ module GovukElementsFormBuilder
       errors.messages.key?(attribute) && !errors.messages[attribute].empty?
     end
 
-    def adjust_nested_object_attribute attribute
-      if parent_builder?
-        attribute.to_s.
-          sub("#{attribute_prefix}_", '').
-          to_sym
-      else
-        attribute
-      end
-    end
-
-    def parent_builder?
-      options[:parent_builder].present?
+    def object_attribute_for field
+      field.to_s.
+        sub("#{attribute_prefix}_", '').
+        to_sym
     end
 
     def add_hint label, name
@@ -115,9 +105,14 @@ module GovukElementsFormBuilder
         scope: 'helpers.hint').presence
     end
 
-    def label_text attribute
-      I18n.t("#{object_name}.#{attribute}",
-        default: attribute.to_s.humanize.capitalize,
+    def default_label attribute
+      attribute.to_s.humanize.capitalize
+    end
+
+    def localized_label attribute
+      key = "#{object_name}.#{attribute}"
+      I18n.t(key,
+        default: default_label(attribute),
         scope: 'helpers.label').presence
     end
   end

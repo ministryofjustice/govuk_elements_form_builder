@@ -124,9 +124,9 @@ RSpec.describe GovukElementsFormBuilder::FormBuilder do
         expect_equal output, [
           '<div class="form-group error" id="error_person_address_attributes_country_attributes_name">',
           '<label class="form-label" for="person_address_attributes_country_attributes_name">',
-          'Name',
+          'Country',
           '<span class="error-message" id="error_message_person_address_attributes_country_attributes_name">',
-          "Name can't be blank",
+          "Country can't be blank",
           '</span>',
           '</label>',
           '<input aria-describedby="error_message_person_address_attributes_country_attributes_name" class="form-control" type="text" name="person[address_attributes][country_attributes][name]" id="person_address_attributes_country_attributes_name" />',

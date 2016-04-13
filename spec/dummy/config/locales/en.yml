@@ -32,6 +32,8 @@ en:
         password_confirmation: Confirm password
       person[address_attributes]:
         address: Full address
+      person[address_attributes][country_attributes]:
+        name: Country
     hint:
       person:
         email_home: For eg. John.Smith@example.com
