@@ -109,6 +109,32 @@ RSpec.describe GovukElementsFormBuilder::FormBuilder do
       end
     end
 
+    context 'when validation error on twice nested child object' do
+      it 'outputs error message in span inside label' do
+        resource.address = Address.new
+        resource.address.country = Country.new
+        resource.address.country.valid?
+
+        output = builder.fields_for(:address) do |address|
+          address.fields_for(:country) do |country|
+            country.text_field :name
+          end
+        end
+
+        expect_equal output, [
+          '<div class="form-group error" id="error_person_address_attributes_country_attributes_name">',
+          '<label class="form-label" for="person_address_attributes_country_attributes_name">',
+          'Name',
+          '<span class="error-message" id="error_message_person_address_attributes_country_attributes_name">',
+          "Name can't be blank",
+          '</span>',
+          '</label>',
+          '<input aria-describedby="error_message_person_address_attributes_country_attributes_name" class="form-control" type="text" name="person[address_attributes][country_attributes][name]" id="person_address_attributes_country_attributes_name" />',
+          '</div>'
+        ]
+      end
+    end
+
   end
 
   describe '#text_area' do

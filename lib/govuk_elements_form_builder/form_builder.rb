@@ -50,7 +50,7 @@ module GovukElementsFormBuilder
     end
 
     def attribute_prefix
-      @object_name.to_s.tr('[]','_').chomp('_')
+      @object_name.to_s.tr('[]','_').squeeze('_').chomp('_')
     end
 
     def form_group_id attribute
