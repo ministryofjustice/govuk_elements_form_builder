@@ -23,7 +23,7 @@ RSpec.describe GovukElementsErrorsHelper, type: :helper do
           error_summary_description +
         '</p>' +
         '<ul class="error-summary-list">' +
-          '<li><a href="#error_person_name">Name can&#39;t be blank</a></li>' +
+          '<li><a href="#error_person_name">Full name can&#39;t be blank</a></li>' +
         '</ul>' +
       '</div>')
     end
@@ -46,6 +46,29 @@ RSpec.describe GovukElementsErrorsHelper, type: :helper do
         '</p>' +
         '<ul class="error-summary-list">' +
           '<li><a href="#error_person_address_attributes_postcode">Postcode can&#39;t be blank</a></li>' +
+        '</ul>' +
+      '</div>')
+    end
+  end
+
+  describe '#error_summary when twice nested child object has validation errors' do
+    it 'outputs error full messages of child object' do
+      resource.address = Address.new
+      resource.address.country = Country.new
+      resource.address.country.valid?
+
+      output = described_class.error_summary resource, error_summary_heading, error_summary_description
+      expect(output).to_not be_nil
+      expect(split_html(output)).to eq split_html('<div ' +
+          'class="error-summary" role="group" aria-labelledby="error-summary-heading" tabindex="-1">' +
+        '<h1 id="error-summary-heading" class="heading-medium error-summary-heading">' +
+          error_summary_heading +
+        '</h1>' +
+        '<p>' +
+          error_summary_description +
+        '</p>' +
+        '<ul class="error-summary-list">' +
+          '<li><a href="#error_person_address_attributes_country_attributes_name">Country can&#39;t be blank</a></li>' +
         '</ul>' +
       '</div>')
     end
