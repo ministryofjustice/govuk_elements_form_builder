@@ -36,24 +36,19 @@ module GovukElementsFormBuilder
       end
     end
 
-    def collection_radio_buttons(attribute, records, record_id, record_name)
+    def radio_button_fieldset attribute, legend, options={}
+      options[:choice] ||= { 'Yes': 'yes', 'No': 'no' }
+      content_tag :fieldset do
+        safe_join([
+          content_tag(:legend, legend, class: 'visuallyhidden'),
 
-      content_tag(:h1, "Gender", class: 'heading-medium') +
-      content_tag(:fieldset,
-        content_tag(:legend, "Gender", class:'visuallyhidden') +
-        safe_join(records.map do | record |
-
-          element_id = "#{object_name}_#{attribute}_#{record.send(record_id)}"
-
-          label(attribute, class: "block-label") do | label |
-
-            radio_button_tag( "#{object_name}[#{attribute}][]", record.send(record_name) )
-            
+          options[:choice].map do |label_text, choice|
+            label(attribute, class: 'block-label', value: choice) do |tag|
+              radio_button(attribute, choice) + label_text
+            end
           end
-
-        end)
-      )
-      #.html_safe
+        ], "\n")
+      end
     end
 
     private
