@@ -37,14 +37,14 @@ module GovukElementsFormBuilder
     end
 
     def radio_button_fieldset attribute, legend, options={}
-      options[:choice] ||= { 'Yes': 'yes', 'No': 'no' }
+      choices = options[:choices] || [ :yes, :no ]
       content_tag :fieldset do
         safe_join([
           content_tag(:legend, legend, class: 'visuallyhidden'),
 
-          options[:choice].map do |label_text, choice|
+          choices.map do |choice|
             label(attribute, class: 'block-label', value: choice) do |tag|
-              radio_button(attribute, choice) + label_text
+              radio_button(attribute, choice) + localized_label("#{attribute}.#{choice}")
             end
           end
         ], "\n")
@@ -121,7 +121,7 @@ module GovukElementsFormBuilder
     end
 
     def default_label attribute
-      attribute.to_s.humanize.capitalize
+      attribute.to_s.split('.').last.humanize.capitalize
     end
 
     def localized_label attribute

@@ -30,6 +30,9 @@ en:
         ni_number: National Insurance number
         password: Password
         password_confirmation: Confirm password
+        gender:
+          male: Male or identify as male
+          female: Female or identify as female
       person[address_attributes]:
         address: Full address
       person[address_attributes][country_attributes]:
