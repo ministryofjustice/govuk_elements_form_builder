@@ -36,11 +36,11 @@ module GovukElementsFormBuilder
       end
     end
 
-    def radio_button_fieldset attribute, legend, options={}
+    def radio_button_fieldset attribute, options={}
       choices = options[:choices] || [ :yes, :no ]
       content_tag :fieldset do
         safe_join([
-          content_tag(:legend, legend, class: 'visuallyhidden'),
+          content_tag(:legend, fieldset_text(attribute), class: 'visuallyhidden'),
 
           choices.map do |choice|
             label(attribute, class: 'block-label', value: choice) do |tag|
@@ -114,10 +114,12 @@ module GovukElementsFormBuilder
       end
     end
 
-    def hint_text name
-      I18n.t("#{object_name}.#{name}",
-        default: '',
-        scope: 'helpers.hint').presence
+    def fieldset_text attribute
+      localized 'helpers.fieldset', attribute, default_label(attribute)
+    end
+
+    def hint_text attribute
+      localized 'helpers.hint', attribute, ''
     end
 
     def default_label attribute
@@ -125,10 +127,14 @@ module GovukElementsFormBuilder
     end
 
     def localized_label attribute
+      localized 'helpers.label', attribute, default_label(attribute)
+    end
+
+    def localized scope, attribute, default
       key = "#{object_name}.#{attribute}"
       I18n.t(key,
-        default: default_label(attribute),
-        scope: 'helpers.label').presence
+        default: default,
+        scope: scope).presence
     end
   end
 end

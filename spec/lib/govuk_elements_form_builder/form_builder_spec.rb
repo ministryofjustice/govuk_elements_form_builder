@@ -224,11 +224,11 @@ RSpec.describe GovukElementsFormBuilder::FormBuilder do
 
   describe '#radio_button_fieldset' do
     it 'outputs radio buttons wrapped in labels' do
-      output = builder.radio_button_fieldset :gender, 'Gender', choices: [ :male, :female, :unknown ]
+      output = builder.radio_button_fieldset :gender, choices: [ :male, :female, :unknown ]
       expect_equal output, [
         '<fieldset>',
         '<legend class="visuallyhidden">',
-        'Gender',
+        'Specify gender identity',
         '</legend>',
         '<label class="block-label" for="person_gender_male">',
         '<input type="radio" value="male" name="person[gender]" id="person_gender_male" />',

@@ -22,6 +22,9 @@
 en:
   hello: "Hello world"
   helpers:
+    fieldset:
+      person:
+        gender: Specify gender identity
     label:
       person:
         email_home: Home email address
