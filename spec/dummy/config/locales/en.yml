@@ -45,5 +45,6 @@ en:
         email_home: For eg. John.Smith@example.com
         ni_number: It’ll be on your last payslip. For example, JH 21 90 0A.
         password_confirmation: Password should match
+        gender: If unknown at time of application choose unknown
       person[address_attributes]:
         address: Exclude postcode. For example, 102 Petty France, London

@@ -30,7 +30,7 @@ module GovukElementsFormBuilder
           options[:class] = text_field_class
 
           label = label(attribute, class: "form-label")
-          add_hint label, attribute
+          add_hint :label, label, attribute
           (label + super(attribute, options.except(:label)) ).html_safe
         end
       end
@@ -38,10 +38,11 @@ module GovukElementsFormBuilder
 
     def radio_button_fieldset attribute, options={}
       choices = options[:choices] || [ :yes, :no ]
+      legend = content_tag(:legend, fieldset_text(attribute), class: 'heading-medium')
+      add_hint :legend, legend, attribute
       content_tag :fieldset do
         safe_join([
-          content_tag(:legend, fieldset_text(attribute), class: 'visuallyhidden'),
-
+          legend.html_safe,
           choices.map do |choice|
             label(attribute, class: 'block-label', value: choice) do |tag|
               radio_button(attribute, choice) + localized_label("#{attribute}.#{choice}")
@@ -107,10 +108,10 @@ module GovukElementsFormBuilder
         to_sym
     end
 
-    def add_hint label, name
+    def add_hint tag, element, name
       if hint = hint_text(name)
         hint_span = content_tag(:span, hint, class: 'form-hint')
-        label.sub!('</label>', hint_span + '</label>'.html_safe)
+        element.sub!("</#{tag}>", "#{hint_span}</#{tag}>".html_safe)
       end
     end
 
