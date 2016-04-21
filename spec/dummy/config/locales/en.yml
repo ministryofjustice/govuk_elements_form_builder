@@ -24,19 +24,20 @@ en:
   helpers:
     fieldset:
       person:
-        gender: Specify gender identity
+        location: Where do you live?
         has_user_account: Do you already have a personal user account?
     label:
       person:
         email_home: Home email address
         email_work: Work email address
+        location:
+          ni: Northern Ireland
+          isle_of_man_channel_islands: Isle of Man or Channel Islands
+          british_abroad: I am a British citizen living abroad
         name: Full name
         ni_number: National Insurance number
         password: Password
         password_confirmation: Confirm password
-        gender:
-          male: Male or identify as male
-          female: Female or identify as female
       person[address_attributes]:
         address: Full address
       person[address_attributes][country_attributes]:
@@ -44,8 +45,8 @@ en:
     hint:
       person:
         email_home: For eg. John.Smith@example.com
+        location: Select from these options because you answered you do not reside in England, Wales, or Scotland
         ni_number: It’ll be on your last payslip. For example, JH 21 90 0A.
         password_confirmation: Password should match
-        gender: If unknown at time of application choose unknown
       person[address_attributes]:
         address: Exclude postcode. For example, 102 Petty France, London

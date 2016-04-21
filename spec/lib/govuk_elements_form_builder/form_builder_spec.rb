@@ -224,26 +224,26 @@ RSpec.describe GovukElementsFormBuilder::FormBuilder do
 
   describe '#radio_button_fieldset' do
     it 'outputs radio buttons wrapped in labels' do
-      output = builder.radio_button_fieldset :gender, choices: [ :male, :female, :unknown ]
+      output = builder.radio_button_fieldset :location, choices: [:ni, :isle_of_man_channel_islands, :british_abroad]
       expect_equal output, [
         '<fieldset>',
         '<legend class="heading-medium">',
-        'Specify gender identity',
+        'Where do you live?',
         '<span class="form-hint">',
-        'If unknown at time of application choose unknown',
+        'Select from these options because you answered you do not reside in England, Wales, or Scotland',
         '</span>',
         '</legend>',
-        '<label class="block-label" for="person_gender_male">',
-        '<input type="radio" value="male" name="person[gender]" id="person_gender_male" />',
-        'Male or identify as male',
+        '<label class="block-label" for="person_location_ni">',
+        '<input type="radio" value="ni" name="person[location]" id="person_location_ni" />',
+        'Northern Ireland',
         '</label>',
-        '<label class="block-label" for="person_gender_female">',
-        '<input type="radio" value="female" name="person[gender]" id="person_gender_female" />',
-        'Female or identify as female',
+        '<label class="block-label" for="person_location_isle_of_man_channel_islands">',
+        '<input type="radio" value="isle_of_man_channel_islands" name="person[location]" id="person_location_isle_of_man_channel_islands" />',
+        'Isle of Man or Channel Islands',
         '</label>',
-        '<label class="block-label" for="person_gender_unknown">',
-        '<input type="radio" value="unknown" name="person[gender]" id="person_gender_unknown" />',
-        'Unknown',
+        '<label class="block-label" for="person_location_british_abroad">',
+        '<input type="radio" value="british_abroad" name="person[location]" id="person_location_british_abroad" />',
+        'I am a British citizen living abroad',
         '</label>',
         '</fieldset>'
       ]
