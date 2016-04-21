@@ -11,6 +11,7 @@ class Person
   attr_accessor :password
   attr_accessor :password_confirmation
   attr_accessor :gender
+  attr_accessor :has_user_account
 
   attr_accessor :address
 

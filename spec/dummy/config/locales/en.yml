@@ -25,6 +25,7 @@ en:
     fieldset:
       person:
         gender: Specify gender identity
+        has_user_account: Do you already have a personal user account?
     label:
       person:
         email_home: Home email address

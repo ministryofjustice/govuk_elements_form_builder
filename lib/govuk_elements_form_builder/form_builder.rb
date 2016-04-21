@@ -40,7 +40,9 @@ module GovukElementsFormBuilder
       choices = options[:choices] || [ :yes, :no ]
       legend = content_tag(:legend, fieldset_text(attribute), class: 'heading-medium')
       add_hint :legend, legend, attribute
-      content_tag :fieldset do
+      fieldset_options = {}
+      fieldset_options[:class] = 'inline' if options[:inline] == true
+      content_tag :fieldset, fieldset_options do
         safe_join([
           legend.html_safe,
           choices.map do |choice|

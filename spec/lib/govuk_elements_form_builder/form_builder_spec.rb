@@ -249,6 +249,25 @@ RSpec.describe GovukElementsFormBuilder::FormBuilder do
       ]
     end
 
+    it 'outputs yes/no choices when no choices specified, and adds "inline" class to fieldset when passed "inline: true"' do
+      output = builder.radio_button_fieldset :has_user_account, inline: true
+      expect_equal output, [
+        '<fieldset class="inline">',
+        '<legend class="heading-medium">',
+        'Do you already have a personal user account?',
+        '</legend>',
+        '<label class="block-label" for="person_has_user_account_yes">',
+        '<input type="radio" value="yes" name="person[has_user_account]" id="person_has_user_account_yes" />',
+        'Yes',
+        '</label>',
+        '<label class="block-label" for="person_has_user_account_no">',
+        '<input type="radio" value="no" name="person[has_user_account]" id="person_has_user_account_no" />',
+        'No',
+        '</label>',
+        '</fieldset>'
+      ]
+    end
+
   end
 
 end
