@@ -1,7 +1,7 @@
 module GovukElementsFormBuilder
   class FormBuilder < ActionView::Helpers::FormBuilder
 
-    delegate :content_tag, :tag, :safe_join, :radio_button_tag, to: :@template
+    delegate :content_tag, :tag, :safe_join, to: :@template
     delegate :errors, to: :@object
 
     def initialize *args
@@ -17,7 +17,7 @@ module GovukElementsFormBuilder
       super attribute, options.merge(builder: self.class)
     end
 
-    %w[
+    %i[
       email_field
       password_field
       text_area
@@ -37,24 +37,37 @@ module GovukElementsFormBuilder
     end
 
     def radio_button_fieldset attribute, options={}
-      choices = options[:choices] || [ :yes, :no ]
-      legend = content_tag(:legend, fieldset_text(attribute), class: 'heading-medium')
-      add_hint :legend, legend, attribute
-      fieldset_options = {}
-      fieldset_options[:class] = 'inline' if options[:inline] == true
-      content_tag :fieldset, fieldset_options do
+      content_tag :fieldset, fieldset_options(options) do
         safe_join([
-          legend.html_safe,
-          choices.map do |choice|
-            label(attribute, class: 'block-label', value: choice) do |tag|
-              radio_button(attribute, choice) + localized_label("#{attribute}.#{choice}")
-            end
-          end
+          fieldset_legend(attribute),
+          radio_inputs(attribute, options)
         ], "\n")
       end
     end
 
     private
+
+    def radio_inputs attribute, options
+      choices = options[:choices] || [ :yes, :no ]
+      choices.map do |choice|
+        label(attribute, class: 'block-label', value: choice) do |tag|
+          input = radio_button(attribute, choice)
+          input + localized_label("#{attribute}.#{choice}")
+        end
+      end
+    end
+
+    def fieldset_legend attribute
+      legend = content_tag(:legend, fieldset_text(attribute), class: 'heading-medium')
+      add_hint :legend, legend, attribute
+      legend.html_safe
+    end
+
+    def fieldset_options options
+      fieldset_options = {}
+      fieldset_options[:class] = 'inline' if options[:inline] == true
+      fieldset_options
+    end
 
     def add_error_to_html_tag! html_tag
       case html_tag
