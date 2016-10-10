@@ -13,3 +13,5 @@ gemspec
 # To use a debugger
 # gem 'byebug', group: [:development, :test]
 
+
+gem 'rspec-html-matchers', git: 'https://github.com/ministryofjustice/rspec-html-matchers.git'

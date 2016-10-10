@@ -1,3 +1,11 @@
+GIT
+  remote: https://github.com/ministryofjustice/rspec-html-matchers.git
+  revision: e032f4b6736e86fc60ee391278689ab95f3cc455
+  specs:
+    rspec-html-matchers (0.8.0)
+      nokogiri (~> 1)
+      rspec (>= 3.0.0.a, < 4)
+
 PATH
   remote: .
   specs:
@@ -82,14 +90,16 @@ GEM
     mime-types (3.0)
       mime-types-data (~> 3.2015)
     mime-types-data (3.2016.0221)
-    mini_portile2 (2.0.0)
+    mini_portile2 (2.1.0)
     minitest (5.8.4)
     nenv (0.3.0)
-    nokogiri (1.6.7.2)
-      mini_portile2 (~> 2.0.0.rc2)
+    nokogiri (1.6.8)
+      mini_portile2 (~> 2.1.0)
+      pkg-config (~> 1.1.7)
     notiffany (0.0.8)
       nenv (~> 0.1)
       shellany (~> 0.0)
+    pkg-config (1.1.7)
     pry (0.10.3)
       coderay (~> 1.1.0)
       method_source (~> 0.8.1)
@@ -134,9 +144,6 @@ GEM
     rspec-expectations (3.2.1)
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.2.0)
-    rspec-html-matchers (0.8.0)
-      nokogiri (~> 1)
-      rspec (>= 3.0.0.a, < 4)
     rspec-mocks (3.2.1)
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.2.0)
@@ -172,7 +179,7 @@ DEPENDENCIES
   govuk_elements_form_builder!
   guard-rspec
   htmlbeautifier
-  rspec-html-matchers
+  rspec-html-matchers!
   rspec-rails
   sqlite3
 
