@@ -252,7 +252,7 @@ module GovukElementsFormBuilder
       key = "#{object_name}.#{attribute}"
       I18n.t(key,
         default: default,
-        scope: scope).presence
+        scope: scope).html_safe.presence
     end
 
     def localized scope, attribute, default
