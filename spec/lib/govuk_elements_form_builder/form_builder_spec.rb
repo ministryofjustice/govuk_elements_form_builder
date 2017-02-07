@@ -13,7 +13,7 @@ RSpec.describe GovukElementsFormBuilder::FormBuilder do
 
   let(:helper) { TestHelper.new }
   let(:resource)  { Person.new }
-  let(:builder) { described_class.new :person, resource, helper, {} }
+  subject(:builder) { described_class.new :person, resource, helper, {} }
 
   def expect_equal output, expected
     split_output = output.gsub(">\n</textarea>", ' />').split("<").join("\n<").split(">").join(">\n").squeeze("\n").strip + '>'
@@ -30,76 +30,42 @@ RSpec.describe GovukElementsFormBuilder::FormBuilder do
   end
 
   shared_examples_for 'input field' do |method, type|
-
-    def size(method, size)
-      method == :text_area ? '' : %'size="#{size}" '
-    end
+    let(:default_builder_options) { { resource: 'person' } }
 
     it 'outputs label and input wrapped in div' do
       output = builder.send method, :name
 
-      expect_equal output, [
-        '<div class="form-group">',
-        '<label class="form-label" for="person_name">',
-        'Full name',
-        '</label>',
-        %'<#{element_for(method)} class="form-control" #{type_for(method, type)}name="person[name]" id="person_name" />',
-        '</div>'
-      ]
+      expect(output).to match_form_group(default_builder_options.merge(field: :name, input_type: method))
+    end
+
+    it 'supports attributes defined as a string' do
+      output = builder.send method, 'name'
+
+      expect(output).to match_form_group(default_builder_options.merge(field: :name, input_type: method))
     end
 
     it 'adds custom class to input when passed class: "custom-class"' do
       output = builder.send method, :name, class: 'custom-class'
 
-      expect_equal output, [
-        '<div class="form-group">',
-        '<label class="form-label" for="person_name">',
-        'Full name',
-        '</label>',
-        %'<#{element_for(method)} class="form-control custom-class" #{type_for(method, type)}name="person[name]" id="person_name" />',
-        '</div>'
-      ]
+      expect(output).to match_form_group(default_builder_options.merge(field: :name, input_type: method, class: 'custom-class'))
     end
 
     it 'adds custom classes to input when passed class: ["custom-class", "another-class"]' do
       output = builder.send method, :name, class: ['custom-class', 'another-class']
 
-      expect_equal output, [
-        '<div class="form-group">',
-        '<label class="form-label" for="person_name">',
-        'Full name',
-        '</label>',
-        %'<#{element_for(method)} class="form-control custom-class another-class" #{type_for(method, type)}name="person[name]" id="person_name" />',
-        '</div>'
-      ]
+      expect(output).to match_form_group(default_builder_options.merge(field: :name, input_type: method, class: 'custom-class another-class'))
     end
 
     it 'passes options passed to text_field onto super text_field implementation' do
       output = builder.send method, :name, size: 100
-      expect_equal output, [
-        '<div class="form-group">',
-        '<label class="form-label" for="person_name">',
-        'Full name',
-        '</label>',
-        %'<#{element_for(method)} #{size(method, 100)}class="form-control" #{type_for(method, type)}name="person[name]" id="person_name" />',
-        '</div>'
-      ]
+
+      expect(output).to match_form_group(default_builder_options.merge(field: :name, input_type: method, size: 100))
     end
 
     context 'when hint text provided' do
       it 'outputs hint text in span inside label' do
         output = builder.send method, :ni_number
-        expect_equal output, [
-          '<div class="form-group">',
-          '<label class="form-label" for="person_ni_number">',
-          'National Insurance number',
-          '<span class="form-hint">',
-          'It’ll be on your last payslip. For example, JH 21 90 0A.',
-          '</span>',
-          '</label>',
-          %'<#{element_for(method)} class="form-control" #{type_for(method, type)}name="person[ni_number]" id="person_ni_number" />',
-          '</div>'
-        ]
+        expect(output).to match_form_group(default_builder_options.merge(field: :ni_number, input_type: method))
       end
     end
 
@@ -108,14 +74,7 @@ RSpec.describe GovukElementsFormBuilder::FormBuilder do
         output = builder.fields_for(:address, Address.new) do |f|
           f.send method, :postcode
         end
-        expect_equal output, [
-          '<div class="form-group">',
-          '<label class="form-label" for="person_address_attributes_postcode">',
-          'Postcode',
-          '</label>',
-          %'<#{element_for(method)} class="form-control" #{type_for(method, type)}name="person[address_attributes][postcode]" id="person_address_attributes_postcode" />',
-          '</div>'
-        ]
+        expect(output).to match_form_group(default_builder_options.merge(field: :postcode, input_type: method, fields_for: :address))
       end
     end
 
@@ -224,7 +183,7 @@ RSpec.describe GovukElementsFormBuilder::FormBuilder do
   end
 
   describe '#text_area' do
-    include_examples 'input field', :text_area, nil
+    include_examples 'input field', :text_area
   end
 
   describe '#email_field' do

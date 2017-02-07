@@ -192,9 +192,8 @@ module GovukElementsFormBuilder
     end
 
     def form_group_classes attributes
-      attributes = [attributes] if !attributes.respond_to? :count
       classes = 'form-group'
-      classes += ' error' if attributes.find { |a| error_for? a }
+      classes += ' error' if Array(attributes).find { |a| error_for? a }
       classes
     end
 

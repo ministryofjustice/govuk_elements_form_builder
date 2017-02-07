@@ -24,6 +24,7 @@ require 'byebug'
 #
 # Dir[Rails.root.join('spec/support/**/*.rb')].each { |f| require f }
 require_relative 'support/translation_helper.rb'
+require_relative 'support/matcher_helpers.rb'
 
 # Checks for pending migrations before tests are run.
 # If you are not using ActiveRecord, you can remove this line.
@@ -52,4 +53,5 @@ RSpec.configure do |config|
   # The different available types are documented in the features, such as in
   # https://relishapp.com/rspec/rspec-rails/docs
   config.infer_spec_type_from_file_location!
+  config.include MatcherHelpers
 end
