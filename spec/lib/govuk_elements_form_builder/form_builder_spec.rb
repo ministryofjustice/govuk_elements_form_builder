@@ -103,6 +103,14 @@ RSpec.describe GovukElementsFormBuilder::FormBuilder do
       end
     end
 
+    context 'when resource is a not a persisted model' do
+      let(:resource) { Report.new }
+      let(:builder) { described_class.new :report, resource, helper, {} }
+      it "##{method} does not fail" do
+        expect { builder.send method, :name }.not_to raise_error
+      end
+    end
+
     context 'when validation error on object' do
       it 'outputs error message in span inside label' do
         resource.valid?

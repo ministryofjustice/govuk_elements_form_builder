@@ -208,7 +208,9 @@ module GovukElementsFormBuilder
     end
 
     def error_for? attribute
-      errors.messages.key?(attribute) && !errors.messages[attribute].empty?
+      object.respond_to?(:errors) &&
+      errors.messages.key?(attribute) &&
+      !errors.messages[attribute].empty?
     end
 
     private_class_method def self.object_attribute_for field, object_name
