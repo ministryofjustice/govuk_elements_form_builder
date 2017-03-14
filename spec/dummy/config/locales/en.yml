@@ -35,7 +35,7 @@ en:
       person:
         email_home: Home email address
         email_work: Work email address
-        location:
+        location_choices:
           ni: Northern Ireland
           isle_of_man_channel_islands: Isle of Man or Channel Islands
           british_abroad: I am a British citizen living abroad

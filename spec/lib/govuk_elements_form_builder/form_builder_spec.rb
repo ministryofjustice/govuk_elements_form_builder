@@ -411,7 +411,7 @@ RSpec.describe GovukElementsFormBuilder::FormBuilder do
       expect_equal output, [
           '<div class="form-group">',
           '<label class="form-label" for="person_location">',
-          '{:ni=&gt;&quot;Northern Ireland&quot;, :isle_of_man_channel_islands=&gt;&quot;Isle of Man or Channel Islands&quot;, :british_abroad=&gt;&quot;I am a British citizen living abroad&quot;}',
+          'Location',
           %'<span class="form-hint">',
           'Select from these options because you answered you do not reside in England, Wales, or Scotland',
           %'</span>',

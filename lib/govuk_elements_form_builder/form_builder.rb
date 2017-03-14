@@ -106,7 +106,7 @@ module GovukElementsFormBuilder
       choices.map do |choice|
         label(attribute, class: 'block-label selection-button-radio', value: choice) do |tag|
           input = radio_button(attribute, choice)
-          input + localized_label("#{attribute}.#{choice}")
+          input + localized_label("#{attribute}_choices.#{choice}")
         end
       end
     end
