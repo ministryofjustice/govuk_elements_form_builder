@@ -29,16 +29,24 @@ RSpec.describe GovukElementsFormBuilder::FormBuilder do
     method == :text_area ? '' : %'type="#{type}" '
   end
 
+  def html_attributes(hash)
+    if  hash.present?
+      hash.map{|k,v| %'#{k}="#{v}" '}.join(' ')
+    end
+  end
+
   shared_examples_for 'input field' do |method, type|
 
     def size(method, size)
       (size.nil? || method == :text_area) ? '' : %'size="#{size}" '
     end
 
-    def expected_name_input_html method, type, classes=nil, size=nil
+    def expected_name_input_html method, type, classes=nil, size=nil, label_options=nil
+      label_options ||= {}
+      label_options[:class] ||= nil
       [
         '<div class="form-group">',
-        '<label class="form-label" for="person_name">',
+        %'<label #{html_attributes(label_options.except(:class, :for))}class="form-label#{label_options[:class]}" for="person_name">',
         'Full name',
         '</label>',
         %'<#{element_for(method)} #{size(method, size)}class="form-control#{classes}" #{type_for(method, type)}name="person[name]" id="person_name" />',
@@ -62,6 +70,20 @@ RSpec.describe GovukElementsFormBuilder::FormBuilder do
       output = builder.send method, :name, class: ['custom-class', 'another-class']
 
       expect_equal output, expected_name_input_html(method, type, ' custom-class another-class')
+    end
+
+    it 'adds custom classes to label when passed class: ["custom-class", "another-class"]' do
+      label_class_options = { class: ' custom-label-class another-label-class' }
+      output = builder.send method, :name, {label_options: {class: ['custom-label-class', 'another-label-class']}}
+
+      expect_equal output, expected_name_input_html( method, type, nil, nil, label_class_options)
+    end
+
+    it 'passes other html attribute to the label if they are provided' do
+      label_attr_options = { style: 'color:red;'}
+      output = builder.send method, :name, {label_options: {style: 'color:red;'}}
+
+      expect_equal output, expected_name_input_html( method, type, nil, nil, label_attr_options)
     end
 
     it 'passes options passed to text_field onto super text_field implementation' do
