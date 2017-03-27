@@ -253,6 +253,7 @@ RSpec.describe GovukElementsFormBuilder::FormBuilder do
 
   describe '#radio_button_fieldset' do
     let(:pretty_output) { HtmlBeautifier.beautify output }
+
     it 'outputs radio buttons wrapped in labels' do
       output = builder.radio_button_fieldset :location, choices: [:ni, :isle_of_man_channel_islands, :british_abroad]
       expect_equal output, [
@@ -306,6 +307,35 @@ RSpec.describe GovukElementsFormBuilder::FormBuilder do
       ]
     end
 
+    context 'with a couple associated cases' do
+      let(:case_1) { Case.new(id: 1, name: 'Case One')  }
+      let(:case_2) { Case.new(id: 2, name: 'Case Two')  }
+      let(:cases) { [case_1, case_2] }
+
+      it 'accepts value_method and text_method to better control generated HTML' do
+        output = builder.radio_button_fieldset :case_id, choices: cases, value_method: :id, text_method: :name, inline: true
+        expect_equal output, [
+                       '<div class="form-group">',
+                       '<fieldset class="inline">',
+                       '<legend>',
+                       '<span class="form-label-bold">',
+                       'Case',
+                       '</span>',
+                       '</legend>',
+                       '<label class="block-label selection-button-radio" for="person_case_id_1">',
+                       '<input type="radio" value="1" name="person[case_id]" id="person_case_id_1" />',
+                       'Case One',
+                       '</label>',
+                       '<label class="block-label selection-button-radio" for="person_case_id_2">',
+                       '<input type="radio" value="2" name="person[case_id]" id="person_case_id_2" />',
+                       'Case Two',
+                       '</label>',
+                       '</fieldset>',
+                       '</div>'
+                     ]
+
+      end
+    end
 
     context 'the resource is invalid' do
       let(:resource) { Person.new.tap { |p| p.valid? } }

@@ -104,9 +104,17 @@ module GovukElementsFormBuilder
     def radio_inputs attribute, options
       choices = options[:choices] || [ :yes, :no ]
       choices.map do |choice|
-        label(attribute, class: 'block-label selection-button-radio', value: choice) do |tag|
-          input = radio_button(attribute, choice)
-          input + localized_label("#{attribute}.#{choice}")
+        value = choice.send(options[:value_method] || :to_s)
+        label attribute,
+              class: 'block-label selection-button-radio',
+              value: value do |tag|
+          input = radio_button(attribute, value)
+          text = if options.has_key? :text_method
+                   choice.send(options[:text_method])
+                 else
+                   localized_label("#{attribute}.#{choice}")
+                 end
+          input + text
         end
       end
     end
