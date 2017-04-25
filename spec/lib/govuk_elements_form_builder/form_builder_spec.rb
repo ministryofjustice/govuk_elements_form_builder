@@ -254,7 +254,7 @@ RSpec.describe GovukElementsFormBuilder::FormBuilder do
   describe '#radio_button_fieldset' do
     let(:pretty_output) { HtmlBeautifier.beautify output }
 
-    it 'outputs radio buttons wrapped in labels' do
+    it 'outputs radio buttons in a stacked layout' do
       output = builder.radio_button_fieldset :location, choices: [:ni, :isle_of_man_channel_islands, :british_abroad]
       expect_equal output, [
         '<div class="form-group">',
@@ -267,18 +267,24 @@ RSpec.describe GovukElementsFormBuilder::FormBuilder do
         'Select from these options because you answered you do not reside in England, Wales, or Scotland',
         '</span>',
         '</legend>',
-        '<label class="block-label selection-button-radio" for="person_location_ni">',
+        '<div class="multiple-choice">',
         '<input type="radio" value="ni" name="person[location]" id="person_location_ni" />',
+        '<label for="person_location_ni">',
         'Northern Ireland',
         '</label>',
-        '<label class="block-label selection-button-radio" for="person_location_isle_of_man_channel_islands">',
+        '</div>',
+        '<div class="multiple-choice">',
         '<input type="radio" value="isle_of_man_channel_islands" name="person[location]" id="person_location_isle_of_man_channel_islands" />',
+        '<label for="person_location_isle_of_man_channel_islands">',
         'Isle of Man or Channel Islands',
         '</label>',
-        '<label class="block-label selection-button-radio" for="person_location_british_abroad">',
+        '</div>',
+        '<div class="multiple-choice">',
         '<input type="radio" value="british_abroad" name="person[location]" id="person_location_british_abroad" />',
+        '<label for="person_location_british_abroad">',
         'I am a British citizen living abroad',
         '</label>',
+        '</div>',
         '</fieldset>',
         '</div>'
       ]
@@ -294,14 +300,18 @@ RSpec.describe GovukElementsFormBuilder::FormBuilder do
         'Do you already have a personal user account?',
         '</span>',
         '</legend>',
-        '<label class="block-label selection-button-radio" for="person_has_user_account_yes">',
+        '<div class="multiple-choice">',
         '<input type="radio" value="yes" name="person[has_user_account]" id="person_has_user_account_yes" />',
+        '<label for="person_has_user_account_yes">',
         'Yes',
         '</label>',
-        '<label class="block-label selection-button-radio" for="person_has_user_account_no">',
+        '</div>',
+        '<div class="multiple-choice">',
         '<input type="radio" value="no" name="person[has_user_account]" id="person_has_user_account_no" />',
+        '<label for="person_has_user_account_no">',
         'No',
         '</label>',
+        '</div>',
         '</fieldset>',
         '</div>'
       ]
@@ -322,14 +332,18 @@ RSpec.describe GovukElementsFormBuilder::FormBuilder do
                        'Case',
                        '</span>',
                        '</legend>',
-                       '<label class="block-label selection-button-radio" for="person_case_id_1">',
+                       '<div class="multiple-choice">',
                        '<input type="radio" value="1" name="person[case_id]" id="person_case_id_1" />',
+                       '<label for="person_case_id_1">',
                        'Case One',
                        '</label>',
-                       '<label class="block-label selection-button-radio" for="person_case_id_2">',
+                       '</div>',
+                       '<div class="multiple-choice">',
                        '<input type="radio" value="2" name="person[case_id]" id="person_case_id_2" />',
+                       '<label for="person_case_id_2">',
                        'Case Two',
                        '</label>',
+                       '</div>',
                        '</fieldset>',
                        '</div>'
                      ]
@@ -353,14 +367,18 @@ RSpec.describe GovukElementsFormBuilder::FormBuilder do
                        'Gender is required',
                        '</span>',
                        '</legend>',
-                       '<label class="block-label selection-button-radio" for="person_gender_yes">',
+                       '<div class="multiple-choice">',
                        '<input aria-describedby="error_message_person_gender_yes" type="radio" value="yes" name="person[gender]" id="person_gender_yes" />',
+                       '<label for="person_gender_yes">',
                        'Yes',
                        '</label>',
-                       '<label class="block-label selection-button-radio" for="person_gender_no">',
+                       '</div>',
+                       '<div class="multiple-choice">',
                        '<input aria-describedby="error_message_person_gender_no" type="radio" value="no" name="person[gender]" id="person_gender_no" />',
+                       '<label for="person_gender_no">',
                        'No',
                        '</label>',
+                       '</div>',
                        '</fieldset>',
                        '</div>'
                      ]
@@ -369,7 +387,7 @@ RSpec.describe GovukElementsFormBuilder::FormBuilder do
   end
 
   describe '#check_box_fieldset' do
-    it 'outputs checkboxes wrapped in labels' do
+    it 'outputs checkboxes in a stacked layout' do
       resource.waste_transport = WasteTransport.new
       output = builder.fields_for(:waste_transport) do |f|
         f.check_box_fieldset :waste_transport, [:animal_carcasses, :mines_quarries, :farm_agricultural]
@@ -386,25 +404,31 @@ RSpec.describe GovukElementsFormBuilder::FormBuilder do
         'Select all that apply',
         '</span>',
         '</legend>',
-        '<label class="block-label selection-button-checkbox" for="person_waste_transport_attributes_animal_carcasses">',
+        '<div class="multiple-choice">',
         '<input name="person[waste_transport_attributes][animal_carcasses]" type="hidden" value="0" />',
         '<input type="checkbox" value="1" name="person[waste_transport_attributes][animal_carcasses]" id="person_waste_transport_attributes_animal_carcasses" />',
+        '<label for="person_waste_transport_attributes_animal_carcasses">',
         'Waste from animal carcasses',
         '<br>',
         '<em>',
         'includes sloths and other Bradypodidae',
         '</em>',
         '</label>',
-        '<label class="block-label selection-button-checkbox" for="person_waste_transport_attributes_mines_quarries">',
+        '</div>',
+        '<div class="multiple-choice">',
         '<input name="person[waste_transport_attributes][mines_quarries]" type="hidden" value="0" />',
         '<input type="checkbox" value="1" name="person[waste_transport_attributes][mines_quarries]" id="person_waste_transport_attributes_mines_quarries" />',
+        '<label for="person_waste_transport_attributes_mines_quarries">',
         'Waste from mines or quarries (&gt; 200 lbs)',
         '</label>',
-        '<label class="block-label selection-button-checkbox" for="person_waste_transport_attributes_farm_agricultural">',
+        '</div>',
+        '<div class="multiple-choice">',
         '<input name="person[waste_transport_attributes][farm_agricultural]" type="hidden" value="0" />',
         '<input type="checkbox" value="1" name="person[waste_transport_attributes][farm_agricultural]" id="person_waste_transport_attributes_farm_agricultural" />',
+        '<label for="person_waste_transport_attributes_farm_agricultural">',
         'Farm or agricultural waste',
         '</label>',
+        '</div>',
         '</fieldset>',
         '</div>'
       ]

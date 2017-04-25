@@ -94,9 +94,12 @@ module GovukElementsFormBuilder
 
     def check_box_inputs attributes
       attributes.map do |attribute|
-        label(attribute, class: 'block-label selection-button-checkbox') do |tag|
-          input = check_box(attribute)
-          input + localized_label("#{attribute}")
+        input = check_box(attribute)
+        label = label(attribute) do |tag|
+          localized_label("#{attribute}")
+        end
+        content_tag :div, class: "multiple-choice" do
+          input + label
         end
       end
     end
@@ -105,16 +108,17 @@ module GovukElementsFormBuilder
       choices = options[:choices] || [ :yes, :no ]
       choices.map do |choice|
         value = choice.send(options[:value_method] || :to_s)
-        label attribute,
-              class: 'block-label selection-button-radio',
-              value: value do |tag|
-          input = radio_button(attribute, value)
-          text = if options.has_key? :text_method
-                   choice.send(options[:text_method])
-                 else
-                   localized_label("#{attribute}.#{choice}")
-                 end
-          input + text
+        input = radio_button(attribute, value)
+        label = label(attribute, value: value) do |tag|
+                text = if options.has_key? :text_method
+                        choice.send(options[:text_method])
+                      else
+                        localized_label("#{attribute}.#{choice}")
+                      end
+                text
+        end
+        content_tag :div, class: "multiple-choice" do
+          input + label
         end
       end
     end
