@@ -30,7 +30,7 @@ module GovukElementsFormBuilder
           options = args.extract_options!
 
           set_label_classes! options
-          set_field_classes! options
+          set_field_classes! options, attribute
 
           label = label(attribute, options[:label_options])
 
@@ -72,7 +72,7 @@ module GovukElementsFormBuilder
       content_tag :div, class: form_group_classes(method), id: form_group_id(method) do
 
         html_options = args.extract_options!
-        set_field_classes! html_options
+        set_field_classes! html_options, method
 
         label = label(method, class: "form-label")
         add_hint :label, label, method
@@ -84,8 +84,9 @@ module GovukElementsFormBuilder
 
     private
 
-    def set_field_classes! options
+    def set_field_classes! options, attribute
       text_field_class = "form-control"
+      text_field_class = [text_field_class, 'form-control-error'] if error_for? attribute
       options[:class] = case options[:class]
                         when String
                           [text_field_class, options[:class]]
@@ -230,7 +231,7 @@ module GovukElementsFormBuilder
     def form_group_classes attributes
       attributes = [attributes] if !attributes.respond_to? :count
       classes = 'form-group'
-      classes += ' error' if attributes.find { |a| error_for? a }
+      classes += ' form-group-error' if attributes.find { |a| error_for? a }
       classes
     end
 

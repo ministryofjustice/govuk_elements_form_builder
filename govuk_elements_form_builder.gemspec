@@ -17,6 +17,9 @@ Gem::Specification.new do |s|
   s.files = Dir["{app,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.rdoc"]
 
   s.add_dependency "rails", ">= 4.2"
+  # Needed to ensure correct css/js is available
+  s.add_dependency 'govuk_frontend_toolkit', '>= 6.0.0'
+  s.add_dependency 'govuk_elements_rails',   '>= 3.0.0'
 
   s.add_development_dependency "sqlite3"
   s.add_development_dependency "rspec-rails"

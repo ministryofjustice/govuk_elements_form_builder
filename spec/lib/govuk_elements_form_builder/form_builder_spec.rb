@@ -221,14 +221,14 @@ RSpec.describe GovukElementsFormBuilder::FormBuilder do
 
   def expected_error_html method, type, attribute, name_value, label, error
     [
-      %'<div class="form-group error" id="error_#{attribute}">',
+      %'<div class="form-group form-group-error" id="error_#{attribute}">',
       %'<label class="form-label" for="#{attribute}">',
       label,
       %'<span class="error-message" id="error_message_#{attribute}">',
       error,
       '</span>',
       '</label>',
-      %'<#{element_for(method)} aria-describedby="error_message_#{attribute}" class="form-control" #{type_for(method, type)}name="#{name_value}" id="#{attribute}" />',
+      %'<#{element_for(method)} aria-describedby="error_message_#{attribute}" class="form-control form-control-error" #{type_for(method, type)}name="#{name_value}" id="#{attribute}" />',
       '</div>'
     ]
   end
@@ -379,7 +379,7 @@ RSpec.describe GovukElementsFormBuilder::FormBuilder do
       it 'outputs error messages' do
         output = builder.radio_button_fieldset :gender
         expect_equal output, [
-                       '<div class="form-group error" id="error_person_gender">',
+                       '<div class="form-group form-group-error" id="error_person_gender">',
                        '<fieldset>',
                        '<legend>',
                        '<span class="form-label-bold">',
