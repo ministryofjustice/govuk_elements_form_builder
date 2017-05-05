@@ -75,6 +75,18 @@ RSpec.describe GovukElementsErrorsHelper, type: :helper do
         end
       end
     end
+
+    context 'for a namespaced resource' do
+      let(:resource) { Steps::Appeal::Penalty.new.tap { |p| p.valid? } }
+
+      it 'outputs the specific error message with correct anchoring' do
+        expect(pretty_output).to have_tag('div.error-summary') do
+          with_tag 'ul.error-summary-list' do
+            with_tag 'a[href="#error_steps_appeal_penalty_amount"]', 'Amount is required'
+          end
+        end
+      end
+    end
   end
 
   describe '#error_summary when child object has validation errors' do

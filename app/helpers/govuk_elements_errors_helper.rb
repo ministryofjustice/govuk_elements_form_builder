@@ -178,8 +178,9 @@ module GovukElementsErrorsHelper
     end
   end
 
+  # `underscore` changes '::' to '/' to convert namespaces to paths
   def self.underscore_name object
-    object.class.name.underscore
+    object.class.name.underscore.tr('/'.freeze, '_'.freeze)
   end
 
   private_class_method :error_summary_div
