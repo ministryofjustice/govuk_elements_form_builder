@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    govuk_elements_form_builder (0.0.4)
+    govuk_elements_form_builder (0.0.5)
       rails (>= 4.2)
 
 GEM
@@ -54,8 +54,8 @@ GEM
     erubis (2.7.0)
     ffi (1.9.10)
     formatador (0.2.5)
-    globalid (0.3.7)
-      activesupport (>= 4.1.0)
+    globalid (0.4.0)
+      activesupport (>= 4.2.0)
     guard (2.13.0)
       formatador (>= 0.2.4)
       listen (>= 2.7, <= 4.0)
@@ -79,7 +79,7 @@ GEM
     loofah (2.0.3)
       nokogiri (>= 1.5.9)
     lumberjack (1.0.10)
-    mail (2.6.4)
+    mail (2.6.5)
       mime-types (>= 1.16, < 4)
     method_source (0.8.2)
     mime-types (3.1)
