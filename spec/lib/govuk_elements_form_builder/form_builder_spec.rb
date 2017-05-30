@@ -197,6 +197,25 @@ RSpec.describe GovukElementsFormBuilder::FormBuilder do
       end
     end
 
+    context 'when mixing the rendering order of nested builders' do
+      it 'outputs error messages in span inside label' do
+        resource.address = Address.new
+        resource.address.valid?
+        resource.valid?
+
+        # Render the postcode first
+        builder.fields_for(:address) do |address|
+          address.send method, :postcode
+        end
+
+        output = builder.send method, :name
+
+
+        expected = expected_error_html method, type, 'person_name',
+          'person[name]', 'Full name', 'Full name is required'
+        expect_equal output, expected
+      end
+    end
   end
 
   context 'when mixing the rendering order of nested builders' do
