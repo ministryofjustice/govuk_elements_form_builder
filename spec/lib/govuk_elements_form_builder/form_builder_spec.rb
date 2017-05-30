@@ -313,6 +313,29 @@ RSpec.describe GovukElementsFormBuilder::FormBuilder do
     end
 
     it 'outputs yes/no choices when no choices specified, and adds "inline" class to fieldset when passed "inline: true"' do
+      output = builder.radio_button_fieldset :has_user_account, inline: true, legend_class: 'visuallyhidden'
+      expect_equal output, [
+        '<div class="form-group">',
+        '<fieldset class="inline">',
+        '<legend class="visuallyhidden">',
+        '<span class="form-label-bold">',
+        'Do you already have a personal user account?',
+        '</span>',
+        '</legend>',
+        '<label class="block-label" for="person_has_user_account_yes">',
+        '<input type="radio" value="yes" name="person[has_user_account]" id="person_has_user_account_yes" />',
+        'Yes',
+        '</label>',
+        '<label class="block-label" for="person_has_user_account_no">',
+        '<input type="radio" value="no" name="person[has_user_account]" id="person_has_user_account_no" />',
+        'No',
+        '</label>',
+        '</fieldset>',
+        '</div>'
+      ]
+    end
+
+    it 'allows specifying a class for the legend' do
       output = builder.radio_button_fieldset :has_user_account, inline: true
       expect_equal output, [
         '<div class="form-group">',
@@ -451,6 +474,33 @@ RSpec.describe GovukElementsFormBuilder::FormBuilder do
         'Farm or agricultural waste',
         '</label>',
         '</div>',
+        '</fieldset>',
+        '</div>'
+      ]
+    end
+
+    it 'allows specifying a class for the legend' do
+      resource.waste_transport = WasteTransport.new
+      output = builder.fields_for(:waste_transport) do |f|
+        f.check_box_fieldset :waste_transport, [:animal_carcasses], legend_class: 'visuallyhidden'
+      end
+
+      expect_equal output, [
+        '<div class="form-group">',
+        '<fieldset>',
+        '<legend class="visuallyhidden">',
+        '<span class="form-label-bold">',
+        'Which types of waste do you transport regularly?',
+        '</span>',
+        '<span class="form-hint">',
+        'Select all that apply',
+        '</span>',
+        '</legend>',
+        '<label class="block-label" for="person_waste_transport_attributes_animal_carcasses">',
+        '<input name="person[waste_transport_attributes][animal_carcasses]" type="hidden" value="0" />',
+        '<input type="checkbox" value="1" name="person[waste_transport_attributes][animal_carcasses]" id="person_waste_transport_attributes_animal_carcasses" />',
+        'Waste from animal carcasses',
+        '</label>',
         '</fieldset>',
         '</div>'
       ]

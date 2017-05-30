@@ -47,7 +47,7 @@ module GovukElementsFormBuilder
                   id: form_group_id(attribute) do
         content_tag :fieldset, fieldset_options(attribute, options) do
           safe_join([
-                      fieldset_legend(attribute),
+                      fieldset_legend(attribute, legend_class: options[:legend_class]),
                       radio_inputs(attribute, options)
                     ], "\n")
         end
@@ -60,7 +60,7 @@ module GovukElementsFormBuilder
                   id: form_group_id(attributes) do
         content_tag :fieldset, fieldset_options(attributes, options) do
           safe_join([
-                      fieldset_legend(legend_key),
+                      fieldset_legend(legend_key, legend_class: options[:legend_class]),
                       check_box_inputs(attributes)
                     ], "\n")
         end
@@ -148,8 +148,10 @@ module GovukElementsFormBuilder
       end
     end
 
-    def fieldset_legend attribute
-      legend = content_tag(:legend) do
+    def fieldset_legend attribute, options = {}
+      legend_class = options[:legend_class]
+
+      legend = content_tag(:legend, class: legend_class) do
         tags = [content_tag(
                   :span,
                   fieldset_text(attribute),
