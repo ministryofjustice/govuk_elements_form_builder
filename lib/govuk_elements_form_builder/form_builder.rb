@@ -82,6 +82,19 @@ module GovukElementsFormBuilder
 
     end
 
+    def collection_radio_buttons method, collection, value_method, text_method, options = {}, html_options = {}, *args
+      content_tag :div, class: form_group_classes(method), id: form_group_id(method) do
+        content_tag :fieldset, fieldset_options(method, options) do
+          safe_join([
+                      fieldset_legend(method),
+                      radio_inputs(method, options.merge(choices: collection,
+                                                         value_method: value_method,
+                                                         text_method: text_method))
+                    ], "\n")
+        end
+      end
+    end
+
     private
 
     def set_field_classes! options, attribute

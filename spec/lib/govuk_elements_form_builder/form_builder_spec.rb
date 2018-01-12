@@ -545,4 +545,68 @@ RSpec.describe GovukElementsFormBuilder::FormBuilder do
       ]
     end
   end
+
+  describe '#collection_radio_buttons' do
+    it 'outputs radio buttons wrapped in labels' do
+      @locations = [:ni, :isle_of_man_channel_islands, :british_abroad]
+      output = builder.collection_radio_buttons :location, @locations, :to_s, :to_s
+      expect_equal output, [
+                     '<div class="form-group">',
+                     '<fieldset>',
+                     '<legend>',
+                     '<span class="form-label-bold">',
+                     'Where do you live?',
+                     '</span>',
+                     '<span class="form-hint">',
+                     'Select from these options because you answered you do not reside in England, Wales, or Scotland',
+                     '</span>',
+                     '</legend>',
+                     '<label class="block-label selection-button-radio" for="person_location_ni">',
+                     '<input type="radio" value="ni" name="person[location]" id="person_location_ni" />',
+                     'ni',
+                     '</label>',
+                     '<label class="block-label selection-button-radio" for="person_location_isle_of_man_channel_islands">',
+                     '<input type="radio" value="isle_of_man_channel_islands" name="person[location]" id="person_location_isle_of_man_channel_islands" />',
+                     'isle_of_man_channel_islands',
+                     '</label>',
+                     '<label class="block-label selection-button-radio" for="person_location_british_abroad">',
+                     '<input type="radio" value="british_abroad" name="person[location]" id="person_location_british_abroad" />',
+                     'british_abroad',
+                     '</label>',
+                     '</fieldset>',
+                     '</div>'
+                   ]
+    end
+
+    context 'with a couple associated cases' do
+      let(:pretty_output) { HtmlBeautifier.beautify output }
+      let(:case_1) { Case.new(id: 1, name: 'Case One')  }
+      let(:case_2) { Case.new(id: 2, name: 'Case Two')  }
+      let(:cases) { [case_1, case_2] }
+
+      it 'outputs radio buttons wrapped in labels' do
+        @location = [:ni, :isle_of_man_channel_islands, :british_abroad]
+        output = builder.collection_radio_buttons :case_id, cases, :id, :name
+        expect_equal output, [
+                       '<div class="form-group">',
+                       '<fieldset>',
+                       '<legend>',
+                       '<span class="form-label-bold">',
+                       'Case',
+                       '</span>',
+                       '</legend>',
+                       '<label class="block-label selection-button-radio" for="person_case_id_1">',
+                       '<input type="radio" value="1" name="person[case_id]" id="person_case_id_1" />',
+                       'Case One',
+                       '</label>',
+                       '<label class="block-label selection-button-radio" for="person_case_id_2">',
+                       '<input type="radio" value="2" name="person[case_id]" id="person_case_id_2" />',
+                       'Case Two',
+                       '</label>',
+                       '</fieldset>',
+                       '</div>'
+                     ]
+      end
+    end
+  end
 end
