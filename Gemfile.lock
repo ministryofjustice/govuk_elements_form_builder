@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    govuk_elements_form_builder (1.0.0)
+    govuk_elements_form_builder (1.1.0)
       govuk_elements_rails (>= 3.0.0)
       govuk_frontend_toolkit (>= 6.0.0)
       rails (>= 4.2)
@@ -196,4 +196,4 @@ DEPENDENCIES
   sqlite3
 
 BUNDLED WITH
-   1.14.4
+   1.16.0
