@@ -666,24 +666,37 @@ RSpec.describe GovukElementsFormBuilder::FormBuilder do
       ]
     }
 
-    let(:output) {
+    subject {
       builder.collection_radio_buttons :gender, gender_collection, :code, :name, {id: 'gender-radio-id'}
     }
 
     let(:input_container) {'div.form-group > fieldset > div.multiple-choice'}
 
+    specify 'builds the legend, form label and hint correctly' do
+      expect(subject).to have_tag('div.form-group > fieldset > legend') do |legend|
+        expect(legend).to have_tag('span.form-label-bold', text: 'Gender')
+        expect(legend).to have_tag('span.form-hint', text: 'Select from these options')
+      end
+    end
+
     specify 'adds the correct number of radio buttons' do
-      expect(output).to have_tag(input_container, count: gender_collection.size)
+      expect(subject).to have_tag(input_container, count: gender_collection.size)
     end
 
     specify 'correctly builds the entries' do
       gender_collection.each do |gc|
         attributes = {type: input_type, value: gc.code, name: "person[gender]"}
-        expect(output).to have_tag("#{input_container} > input#person_gender_#{gc.code.downcase}", with: attributes)
+        expect(subject).to have_tag("#{input_container} > input#person_gender_#{gc.code.downcase}", with: attributes)
+      end
+    end
+
+    specify 'correctly labels each radio button' do
+      gender_collection.each do |gc|
+        attributes = {for: "person_gender_#{gc.code.downcase}"}
+        expect(subject).to have_tag("#{input_container} > label", text: gc.name, with: attributes)
       end
     end
   end
-
 
   describe '#collection_check_boxes' do
     let(:input_type) {'checkbox'}
@@ -696,34 +709,34 @@ RSpec.describe GovukElementsFormBuilder::FormBuilder do
       ]
     }
 
-    let(:output) {
+    subject {
       builder.collection_check_boxes :gender, gender_collection, :code, :name, {id: 'gender-radio-id'}
     }
 
     let(:input_container) {'div.form-group > fieldset > div.multiple-choice'}
 
     specify 'builds the legend, form label and hint correctly' do
-      expect(output).to have_tag('div.form-group > fieldset > legend') do |legend|
+      expect(subject).to have_tag('div.form-group > fieldset > legend') do |legend|
         expect(legend).to have_tag('span.form-label-bold', text: 'Gender')
         expect(legend).to have_tag('span.form-hint', text: 'Select from these options')
       end
     end
 
     specify 'adds the correct number of check boxes' do
-      expect(output).to have_tag(input_container, count: gender_collection.size)
+      expect(subject).to have_tag(input_container, count: gender_collection.size)
     end
 
     specify 'correctly builds the entries' do
       gender_collection.each do |gc|
         attributes = {type: input_type, value: gc.code, name: "person[gender][]"}
-        expect(output).to have_tag("#{input_container} > input#person_gender_#{gc.code.downcase}", with: attributes)
+        expect(subject).to have_tag("#{input_container} > input#person_gender_#{gc.code.downcase}", with: attributes)
       end
     end
 
     specify 'correctly labels each check box' do
       gender_collection.each do |gc|
         attributes = {for: "person_gender_#{gc.code.downcase}"}
-        expect(output).to have_tag("#{input_container} > label", text: gc.name, with: attributes)
+        expect(subject).to have_tag("#{input_container} > label", text: gc.name, with: attributes)
       end
     end
 
@@ -732,97 +745,71 @@ RSpec.describe GovukElementsFormBuilder::FormBuilder do
 
   describe '#collection_select' do
 
-    it 'outputs label and input wrapped in div ' do
-      @gender = [:male, :female]
-      output = builder.collection_select :gender, @gender , :to_s, :to_s
-      expect_equal output, [
-          '<div class="form-group">',
-          '<label class="form-label" for="person_gender">',
-          'Gender',
-          '<span class="form-hint">',
-          'Select from these options',
-          '</span>',
-          '</label>',
-          %'<select class="form-control" name="person[gender]" id="person_gender">',
-          %'<option value="male">',
-          'male',
-          %'</option>',
-          %'<option value="female">',
-          'female',
-          %'</option>',
-          %'</select>',
-          '</div>'
-      ]
+    let(:genders) {[:male, :female]}
+
+    context 'select element and labels' do
+
+      subject {builder.collection_select(:gender, genders, :to_s, :to_s)}
+
+      specify 'outputs a div containing select and label elements' do
+
+        expect(subject).to have_tag('div.form-group') do |div|
+          expect(div).to have_tag('label.form-label')
+          expect(div).to have_tag('select.form-control')
+        end
+
+      end
+
+      specify 'the label has the correct text and attributes' do
+        selector = 'div.form-group > label.form-label'
+        expect(subject).to have_tag(selector, text: /Gender/, options: {for: 'person_gender'})
+      end
+
+      specify 'the select box has the correct contents' do
+        selector = 'div.form-group > select#person_gender.form-control'
+        attributes = {name: 'person[gender]'}
+
+        expect(subject).to have_tag(selector, with: attributes) do |select|
+          genders.each do |gender|
+            expect(select).to have_tag('option', with: {value: gender}, text: gender)
+          end
+        end
+
+      end
     end
 
-    it 'outputs select lists with labels and hints' do
-      @location = [:ni, :isle_of_man_channel_islands]
-      output = builder.collection_select :location, @location , :to_s, :to_s, {}
-      expect_equal output, [
-          '<div class="form-group">',
-          '<label class="form-label" for="person_location">',
-          '{:ni=&gt;&quot;Northern Ireland&quot;, :isle_of_man_channel_islands=&gt;&quot;Isle of Man or Channel Islands&quot;, :british_abroad=&gt;&quot;I am a British citizen living abroad&quot;, :other=&gt;&quot;Other location&quot;}',
-          %'<span class="form-hint">',
-          'Select from these options because you answered you do not reside in England, Wales, or Scotland',
-          %'</span>',
-          '</label>',
-          %'<select class="form-control" name="person[location]" id="person_location">',
-          %'<option value="ni">',
-          'ni',
-          %'</option>',%'<option value="isle_of_man_channel_islands">',
-          'isle_of_man_channel_islands',
-          %'</option>',
-          %'</select>',
-          '</div>'
-      ]
+    context 'outputs select lists with labels and hints' do
+      let(:locations) {[:ni, :isle_of_man_channel_islands]}
+      let(:hint) {I18n.t('helpers.hint.person.location')}
+
+      subject {builder.collection_select(:location, locations, :to_s, :to_s, {})}
+
+      specify 'should display the correct hints if they are defined' do
+        selector = 'div.form-group > label.form-label'
+        expect(subject).to have_tag(selector, text: hint, options: {for: 'person_location'})
+      end
+
     end
 
-    it 'adds custom class to input when passed class: "custom-class"' do
-      @gender = [:male, :female]
-      output = builder.collection_select :gender, @gender , :to_s, :to_s, {}, class: "my-custom-style"
-      expect_equal output, [
-          '<div class="form-group">',
-          '<label class="form-label" for="person_gender">',
-          'Gender',
-          '<span class="form-hint">',
-          'Select from these options',
-          '</span>',
-          '</label>',
-          %'<select class="form-control my-custom-style" name="person[gender]" id="person_gender">',
-          %'<option value="male">',
-          'male',
-          %'</option>',
-          %'<option value="female">',
-          'female',
-          %'</option>',
-          %'</select>',
-          '</div>'
-      ]
+    context 'custom classes' do
+      let(:custom_class) {"my-custom-style"}
+      subject {builder.collection_select :gender, genders, :to_s, :to_s, {}, class: custom_class}
+
+      specify 'it should add a custom class when one is supplied' do
+        expect(subject).to have_tag("select.#{custom_class}")
+      end
+
     end
-    it 'includes blanks' do
-      @gender = [:male, :female]
-      output = builder.collection_select :gender, @gender , :to_s, :to_s, {include_blank: "Please select an option"}, {class: "my-custom-style"}
-      expect_equal output, [
-          '<div class="form-group">',
-          '<label class="form-label" for="person_gender">',
-          'Gender',
-          '<span class="form-hint">',
-          'Select from these options',
-          '</span>',
-          '</label>',
-          %'<select class="form-control my-custom-style" name="person[gender]" id="person_gender">',
-          %'<option value="">',
-          'Please select an option',
-          %'</option>',
-          %'<option value="male">',
-          'male',
-          %'</option>',
-          %'<option value="female">',
-          'female',
-          %'</option>',
-          %'</select>',
-          '</div>'
-      ]
+
+    context 'blanks' do
+      let(:blank_text) {"Please select an option"}
+      subject {builder.collection_select :gender, genders, :to_s, :to_s, {include_blank: blank_text}}
+
+      specify 'it should add a insert a blank entry when include_blank is supplied' do
+        expect(subject).to have_tag("select > option", text: blank_text, with: {value: ""})
+      end
+
     end
+
   end
 end
