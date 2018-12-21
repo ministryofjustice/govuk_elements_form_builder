@@ -653,110 +653,78 @@ RSpec.describe GovukElementsFormBuilder::FormBuilder do
       end
       expect(output).to match(/<legend><span class="form-label-bold visuallyhidden" lang="en">/)
     end
-
-    it 'can override the legend text' do
-      output = builder.fields_for(:waste_transport) do |f|
-        f.check_box_fieldset :waste_transport, [:animal_carcasses, :mines_quarries, :farm_agricultural], legend_options: { text: 'A custom legend' }
-      end
-      expect(output).to match(/<legend><span class="form-label-bold">A custom legend<\/span>/)
-    end
   end
 
-  describe '#collection_radio_button' do
-
-     it 'outputs radio buttons in a stacked layout' do
-       person = Person.new
-       gender_collection = [
-           OpenStruct.new(code: 'M', name: 'Masculine'),
-           OpenStruct.new(code: 'F', name: 'Feminine'),
-           OpenStruct.new(code: 'N', name: 'Neuter')
-       ]
-
-       output = builder.collection_radio_buttons :gender, gender_collection,  :code, :name, {id: 'gender-radio-id'}
-
-       expect_equal output, [
-        '<div class="form-group">',
-        '<fieldset>',
-        '<legend>',
-        '<span class="form-label-bold">',
-        'Gender',
-        '</span>',
-        '<span class="form-hint">',
-        'Select from these options',
-        '</span>',
-        '</legend>',
-        '<div class="multiple-choice">',
-        '<input type="radio" value="M" name="person[gender]" id="person_gender_m" />',
-        '<label for="person_gender_m">',
-        'Masculine',
-        '</label>',
-        '</div>',
-        '<div class="multiple-choice">',
-        '<input type="radio" value="F" name="person[gender]" id="person_gender_f" />',
-        '<label for="person_gender_f">',
-        'Feminine',
-        '</label>',
-        '</div>',
-        '<div class="multiple-choice">',
-        '<input type="radio" value="N" name="person[gender]" id="person_gender_n" />',
-        '<label for="person_gender_n">',
-        'Neuter',
-        '</label>',
-        '</div>',
-        '</fieldset>',
-        '</div>'
-       ]
-     end
-
-  end
-
-
-  describe '#collection_check_boxes' do
-
-    it 'outputs check boxes in a stacked layout' do
-      person = Person.new
-      gender_collection = [
+  describe '#collection_radio_buttons' do
+    let(:input_type) {'radio'}
+    let(:person) {Person.new}
+    let(:gender_collection) {
+      [
         OpenStruct.new(code: 'M', name: 'Masculine'),
         OpenStruct.new(code: 'F', name: 'Feminine'),
         OpenStruct.new(code: 'N', name: 'Neuter')
       ]
+    }
 
-      output = builder.collection_check_boxes :gender, gender_collection,  :code, :name, {id: 'gender-radio-id'}
+    let(:output) {
+      builder.collection_radio_buttons :gender, gender_collection, :code, :name, {id: 'gender-radio-id'}
+    }
 
-      expect_equal output, [
-        '<div class="form-group">',
-        '<fieldset>',
-        '<legend>',
-        '<span class="form-label-bold">',
-        'Gender',
-        '</span>',
-        '<span class="form-hint">',
-        'Select from these options',
-        '</span>',
-        '</legend>',
-        '<div class="multiple-choice">',
-        '<input type="checkbox" value="M" name="person[gender][]" id="person_gender_m" />',
-        '<label for="person_gender_m">',
-        'Masculine',
-        '</label>',
-        '</div>',
-        '<div class="multiple-choice">',
-        '<input type="checkbox" value="F" name="person[gender][]" id="person_gender_f" />',
-        '<label for="person_gender_f">',
-        'Feminine',
-        '</label>',
-        '</div>',
-        '<div class="multiple-choice">',
-        '<input type="checkbox" value="N" name="person[gender][]" id="person_gender_n" />',
-        '<label for="person_gender_n">',
-        'Neuter',
-        '</label>',
-        '</div>',
-        # rails adds this hidden field
-        '<input type="hidden" name="person[gender][]" value="" />',
-        '</fieldset>',
-        '</div>'
+    let(:input_container) {'div.form-group > fieldset > div.multiple-choice'}
+
+    specify 'adds the correct number of radio buttons' do
+      expect(output).to have_tag(input_container, count: gender_collection.size)
+    end
+
+    specify 'correctly builds the entries' do
+      gender_collection.each do |gc|
+        attributes = {type: input_type, value: gc.code, name: "person[gender]"}
+        expect(output).to have_tag("#{input_container} > input#person_gender_#{gc.code.downcase}", with: attributes)
+      end
+    end
+  end
+
+
+  describe '#collection_check_boxes' do
+    let(:input_type) {'checkbox'}
+    let(:person) {Person.new}
+    let(:gender_collection) {
+      [
+        OpenStruct.new(code: 'M', name: 'Masculine'),
+        OpenStruct.new(code: 'F', name: 'Feminine'),
+        OpenStruct.new(code: 'N', name: 'Neuter')
       ]
+    }
+
+    let(:output) {
+      builder.collection_check_boxes :gender, gender_collection, :code, :name, {id: 'gender-radio-id'}
+    }
+
+    let(:input_container) {'div.form-group > fieldset > div.multiple-choice'}
+
+    specify 'builds the legend, form label and hint correctly' do
+      expect(output).to have_tag('div.form-group > fieldset > legend') do |legend|
+        expect(legend).to have_tag('span.form-label-bold', text: 'Gender')
+        expect(legend).to have_tag('span.form-hint', text: 'Select from these options')
+      end
+    end
+
+    specify 'adds the correct number of check boxes' do
+      expect(output).to have_tag(input_container, count: gender_collection.size)
+    end
+
+    specify 'correctly builds the entries' do
+      gender_collection.each do |gc|
+        attributes = {type: input_type, value: gc.code, name: "person[gender][]"}
+        expect(output).to have_tag("#{input_container} > input#person_gender_#{gc.code.downcase}", with: attributes)
+      end
+    end
+
+    specify 'correctly labels each check box' do
+      gender_collection.each do |gc|
+        attributes = {for: "person_gender_#{gc.code.downcase}"}
+        expect(output).to have_tag("#{input_container} > label", text: gc.name, with: attributes)
+      end
     end
 
   end
