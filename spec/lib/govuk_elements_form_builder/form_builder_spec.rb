@@ -517,122 +517,94 @@ RSpec.describe GovukElementsFormBuilder::FormBuilder do
   end
 
   describe '#check_box_fieldset' do
-    before do
-      resource.waste_transport = WasteTransport.new
+    before {resource.waste_transport = WasteTransport.new}
+
+    let(:waste_categories) {[:animal_carcasses, :mines_quarries, :farm_agricultural]}
+    subject do
+      builder.fields_for(:waste_transport) {|f| f.check_box_fieldset(:waste_transport, waste_categories)}
     end
 
-    it 'outputs checkboxes wrapped in labels' do
-      resource.waste_transport = WasteTransport.new
-      output = builder.fields_for(:waste_transport) do |f|
-        f.check_box_fieldset :waste_transport, [:animal_carcasses, :mines_quarries, :farm_agricultural]
+    specify 'fieldset has the correct heading' do
+      text = I18n.t('helpers.fieldset.person[waste_transport_attributes].waste_transport')
+      expect(subject).to have_tag('fieldset > legend > span.form-label-bold', text)
+    end
+
+    specify 'outputs checkboxes with labels' do
+      expect(subject).to have_tag('div.form-group') do |form_group|
+        expect(form_group).to have_tag('input', with: {type: 'checkbox'}, count: waste_categories.size)
+        expect(form_group).to have_tag('label', count: waste_categories.size)
       end
-
-      expect_equal output, [
-        '<div class="form-group">',
-        '<fieldset>',
-        '<legend>',
-        '<span class="form-label-bold">',
-        'Which types of waste do you transport regularly?',
-        '</span>',
-        '<span class="form-hint">',
-        'Select all that apply',
-        '</span>',
-        '</legend>',
-        '<div class="multiple-choice">',
-        '<input name="person[waste_transport_attributes][animal_carcasses]" type="hidden" value="0" />',
-        '<input type="checkbox" value="1" name="person[waste_transport_attributes][animal_carcasses]" id="person_waste_transport_attributes_animal_carcasses" />',
-        '<label for="person_waste_transport_attributes_animal_carcasses">',
-        'Waste from animal carcasses',
-        '<br>',
-        '<em>',
-        'includes sloths and other Bradypodidae',
-        '</em>',
-        '</label>',
-        '</div>',
-        '<div class="multiple-choice">',
-        '<input name="person[waste_transport_attributes][mines_quarries]" type="hidden" value="0" />',
-        '<input type="checkbox" value="1" name="person[waste_transport_attributes][mines_quarries]" id="person_waste_transport_attributes_mines_quarries" />',
-        '<label for="person_waste_transport_attributes_mines_quarries">',
-        'Waste from mines or quarries (&gt; 200 lbs)',
-        '</label>',
-        '</div>',
-        '<div class="multiple-choice">',
-        '<input name="person[waste_transport_attributes][farm_agricultural]" type="hidden" value="0" />',
-        '<input type="checkbox" value="1" name="person[waste_transport_attributes][farm_agricultural]" id="person_waste_transport_attributes_farm_agricultural" />',
-        '<label for="person_waste_transport_attributes_farm_agricultural">',
-        'Farm or agricultural waste',
-        '</label>',
-        '</div>',
-        '</fieldset>',
-        '</div>'
-      ]
     end
 
-    it 'outputs markup with support for revealing panels' do
-      resource.waste_transport = WasteTransport.new
-      output = builder.fields_for(:waste_transport) do |f|
-        f.check_box_fieldset :waste_transport, [:animal_carcasses, :mines_quarries, :farm_agricultural] do |fieldset|
-          fieldset.check_box_input(:animal_carcasses)
-          fieldset.check_box_input(:mines_quarries) { f.text_field :mines_quarries_details }
-          fieldset.check_box_input(:farm_agricultural) { f.text_field :farm_agricultural_details }
+    specify 'checkboxes have correct attributes' do
+
+      waste_categories.each do |wc|
+
+        selector = ['person', 'waste_transport_attributes', wc].join('_')
+
+        expect(subject).to have_tag(
+          "input##{selector}",
+          with: {
+            type: 'checkbox',
+            name: "person[waste_transport_attributes][#{wc}]"
+          }
+        )
+
+      end
+    end
+
+    specify 'labels have correct content' do
+      I18n.t('helpers.label.person[waste_transport_attributes]').each do |k,v|
+
+        # this isn't straightforward because Rails's I18n allows for HTML snippets
+        # to be added to the translations, so we need to strip the `_html` suffix
+        # from the key and parse the HTML to extract only the text.
+        target = "person_waste_transport_attributes_#{k}".gsub(/_html$/, "")
+        text = Nokogiri::HTML(v).text
+
+        expect(subject).to have_tag('label', with: {for: target}, text: text)
+      end
+    end
+
+
+    context 'revealing panels' do
+
+      subject do
+        builder.fields_for(:waste_transport) do |f|
+          f.check_box_fieldset :waste_transport, [:animal_carcasses, :mines_quarries, :farm_agricultural] do |fieldset|
+            fieldset.check_box_input(:animal_carcasses)
+            fieldset.check_box_input(:mines_quarries) { f.text_field :mines_quarries_details }
+            fieldset.check_box_input(:farm_agricultural) { f.text_field :farm_agricultural_details }
+          end
         end
       end
 
-      expect_equal output, [
-        '<div class="form-group">',
-        '<fieldset>',
-        '<legend>',
-        '<span class="form-label-bold">',
-        'Which types of waste do you transport regularly?',
-        '</span>',
-        '<span class="form-hint">',
-        'Select all that apply',
-        '</span>',
-        '</legend>',
-        '<div class="multiple-choice">',
-        '<input name="person[waste_transport_attributes][animal_carcasses]" type="hidden" value="0" />',
-        '<input type="checkbox" value="1" name="person[waste_transport_attributes][animal_carcasses]" id="person_waste_transport_attributes_animal_carcasses" />',
-        '<label for="person_waste_transport_attributes_animal_carcasses">',
-        'Waste from animal carcasses',
-        '<br>',
-        '<em>',
-        'includes sloths and other Bradypodidae',
-        '</em>',
-        '</label>',
-        '</div>',
-        '<div class="multiple-choice" data-target="mines_quarries_panel">',
-        '<input name="person[waste_transport_attributes][mines_quarries]" type="hidden" value="0" />',
-        '<input type="checkbox" value="1" name="person[waste_transport_attributes][mines_quarries]" id="person_waste_transport_attributes_mines_quarries" />',
-        '<label for="person_waste_transport_attributes_mines_quarries">',
-        'Waste from mines or quarries (&gt; 200 lbs)',
-        '</label>',
-        '</div>',
-        '<div class="panel panel-border-narrow js-hidden" id="mines_quarries_panel">',
-        '<div class="form-group">',
-        '<label class="form-label" for="person_waste_transport_attributes_mines_quarries_details">',
-        'Mines quarries details',
-        '</label>',
-        '<input class="form-control" type="text" name="person[waste_transport_attributes][mines_quarries_details]" id="person_waste_transport_attributes_mines_quarries_details" />',
-        '</div>',
-        '</div>',
-        '<div class="multiple-choice" data-target="farm_agricultural_panel">',
-        '<input name="person[waste_transport_attributes][farm_agricultural]" type="hidden" value="0" />',
-        '<input type="checkbox" value="1" name="person[waste_transport_attributes][farm_agricultural]" id="person_waste_transport_attributes_farm_agricultural" />',
-        '<label for="person_waste_transport_attributes_farm_agricultural">',
-        'Farm or agricultural waste',
-        '</label>',
-        '</div>',
-        '<div class="panel panel-border-narrow js-hidden" id="farm_agricultural_panel">',
-        '<div class="form-group">',
-        '<label class="form-label" for="person_waste_transport_attributes_farm_agricultural_details">',
-        'Farm agricultural details',
-        '</label>',
-        '<input class="form-control" type="text" name="person[waste_transport_attributes][farm_agricultural_details]" id="person_waste_transport_attributes_farm_agricultural_details" />',
-        '</div>',
-        '</div>',
-        '</fieldset>',
-        '</div>'
-      ]
+      let(:fields_with_hidden_panels) {[:mines_quarries, :farm_agricultural]}
+      let(:field_without_hidden_panel) {:animal_carcasses}
+
+      specify 'inputs are marked as multiple choice' do
+        count = fields_with_hidden_panels.push(field_without_hidden_panel).size
+        expect(subject).to have_tag('div.multiple-choice', count: count)
+      end
+
+      specify 'should not add a text field to checkboxes without associated text fields' do
+        expect(subject).not_to have_tag("div##{field_without_hidden_panel}_panel")
+      end
+
+      specify 'should add a text field to checkboxes with associated text fields' do
+        fields_with_hidden_panels.each do |fwhp|
+          expect(subject).to have_tag("div##{fwhp}_panel") do |panel|
+
+            attributes = {
+              type: 'text',
+              name: "person[waste_transport_attributes][#{fwhp}_details]"
+            }
+
+            expect(panel).to have_tag('div.panel.js-hidden input', with: attributes)
+          end
+        end
+      end
+
     end
 
     it 'outputs markup with support for revealing panels with specific ID' do
