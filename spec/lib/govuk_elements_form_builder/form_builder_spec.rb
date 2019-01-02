@@ -316,42 +316,43 @@ RSpec.describe GovukElementsFormBuilder::FormBuilder do
   end
 
   describe '#radio_button_fieldset' do
+
     let(:pretty_output) { HtmlBeautifier.beautify output }
 
-    it 'outputs radio buttons in a stacked layout' do
-      output = builder.radio_button_fieldset :location, choices: [:ni, :isle_of_man_channel_islands, :british_abroad]
-      expect_equal output, [
-        '<div class="form-group">',
-        '<fieldset>',
-        '<legend>',
-        '<span class="form-label-bold">',
-        'Where do you live?',
-        '</span>',
-        '<span class="form-hint">',
-        'Select from these options because you answered you do not reside in England, Wales, or Scotland',
-        '</span>',
-        '</legend>',
-        '<div class="multiple-choice">',
-        '<input type="radio" value="ni" name="person[location]" id="person_location_ni" />',
-        '<label for="person_location_ni">',
-        'Northern Ireland',
-        '</label>',
-        '</div>',
-        '<div class="multiple-choice">',
-        '<input type="radio" value="isle_of_man_channel_islands" name="person[location]" id="person_location_isle_of_man_channel_islands" />',
-        '<label for="person_location_isle_of_man_channel_islands">',
-        'Isle of Man or Channel Islands',
-        '</label>',
-        '</div>',
-        '<div class="multiple-choice">',
-        '<input type="radio" value="british_abroad" name="person[location]" id="person_location_british_abroad" />',
-        '<label for="person_location_british_abroad">',
-        'I am a British citizen living abroad',
-        '</label>',
-        '</div>',
-        '</fieldset>',
-        '</div>'
-      ]
+    context 'outputs radio buttons in a stacked layout' do
+      let(:locations) {[:ni, :isle_of_man_channel_islands, :british_abroad]}
+      subject {builder.radio_button_fieldset :location, choices: locations}
+
+      specify 'outputs a form group containing the correct number of radio buttons' do
+        expect(subject).to have_tag("div.form-group")
+      end
+
+      specify 'includes the appropriate hint in the form' do
+        expect(subject).to have_tag("span.form-hint", text: I18n.t('helpers.hint.person.location'))
+      end
+
+      specify 'radio buttons exist for each of the relevant options' do
+        locations.each do |location|
+          attributes = {type: 'radio', name: 'person[location]'}
+          selector = "input#person_location_#{location}"
+          expect(subject).to have_tag(selector, with: attributes)
+        end
+      end
+
+      specify 'each radio button should have an appropriate label' do
+
+        # :other isn't specified in :locations so won't appear, don't
+        # check for it
+        I18n
+          .t('helpers.label.person.location')
+          .reject{|k,v| k == :other}
+          .each do |k,v|
+          attributes = {for: "person_location_#{k}"}
+          expect(subject).to have_tag('label', with: attributes, text: v)
+        end
+
+      end
+
     end
 
     it 'outputs yes/no choices when no choices specified, and adds "inline" class to fieldset when passed "inline: true"' do
