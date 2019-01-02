@@ -11,9 +11,10 @@ RSpec.describe GovukElementsFormBuilder::FormBuilder do
     expect(GovukElementsFormBuilder::VERSION).to eq("1.3.1")
   end
 
-  let(:helper) { TestHelper.new }
-  let(:resource)  { Person.new }
-  let(:builder) { described_class.new :person, resource, helper, {} }
+  let(:helper) {TestHelper.new}
+  let(:resource) {Person.new}
+  let(:resource_name) {:person}
+  let(:builder) {described_class.new resource_name, resource, helper, {}}
 
   def expect_equal output, expected
     split_output = output.gsub(">\n</textarea>", ' />').split("<").join("\n<").split(">").join(">\n").squeeze("\n").strip + '>'
@@ -37,79 +38,79 @@ RSpec.describe GovukElementsFormBuilder::FormBuilder do
 
   shared_examples_for 'input field' do |method, type|
 
-    def size(method, size)
-      (size.nil? || method == :text_area) ? '' : %'size="#{size}" '
-    end
+    let(:element) {method.eql?(:text_area) ? "textarea" : "input"}
 
-    def expected_name_input_html method, type, classes=nil, size=nil, label_options=nil
-      label_options ||= {}
-      label_options[:class] ||= nil
-      [
-        '<div class="form-group">',
-        %'<label #{html_attributes(label_options.except(:class, :for))}class="form-label#{label_options[:class]}" for="person_name">',
-        'Full name',
-        '</label>',
-        %'<#{element_for(method)} #{size(method, size)}class="form-control#{classes}" #{type_for(method, type)}name="person[name]" id="person_name" />',
-        '</div>'
-      ]
-    end
+    let(:attribute) {:name}
+    subject {builder.send(method, attribute)}
 
-    it 'outputs label and input wrapped in div' do
-      output = builder.send method, :name
-
-      expect_equal output, expected_name_input_html(method, type)
-    end
-
-    it 'adds custom class to input when passed class: "custom-class"' do
-      output = builder.send method, :name, class: 'custom-class'
-
-      expect_equal output, expected_name_input_html(method, type, ' custom-class')
-    end
-
-    it 'adds custom classes to input when passed class: ["custom-class", "another-class"]' do
-      output = builder.send method, :name, class: ['custom-class', 'another-class']
-
-      expect_equal output, expected_name_input_html(method, type, ' custom-class another-class')
-    end
-
-    it 'adds custom classes to label when passed class: ["custom-class", "another-class"]' do
-      label_class_options = { class: ' custom-label-class another-label-class' }
-      output = builder.send method, :name, {label_options: {class: ['custom-label-class', 'another-label-class']}}
-
-      expect_equal output, expected_name_input_html( method, type, nil, nil, label_class_options)
-    end
-
-    it 'passes other html attribute to the label if they are provided' do
-      label_attr_options = { style: 'color:red;'}
-      output = builder.send method, :name, {label_options: {style: 'color:red;'}}
-
-      expect_equal output, expected_name_input_html( method, type, nil, nil, label_attr_options)
-    end
-
-    it 'passes options passed to text_field onto super text_field implementation' do
-      output = builder.send method, :name, size: 100
-
-      expect_equal output, expected_name_input_html(method, type, nil, 100)
-    end
-
-    context 'when hint text provided' do
-      it 'outputs hint text in span inside label' do
-        output = builder.send method, :ni_number
-        expect_equal output, [
-          '<div class="form-group">',
-          '<label class="form-label" for="person_ni_number">',
-          'National Insurance number',
-          '<span class="form-hint">',
-          'It’ll be on your last payslip. For example, JH 21 90 0A.',
-          '</span>',
-          '</label>',
-          %'<#{element_for(method)} class="form-control" #{type_for(method, type)}name="person[ni_number]" id="person_ni_number" />',
-          '</div>'
-        ]
+    specify 'outputs label and input wrapped in div' do
+      expect(subject).to have_tag('div.form-group') do |fg|
+        expect(fg).to have_tag(element, with: {name: "#{resource_name}[#{attribute}]"})
+        expect(fg).to have_tag("label.form-label", with: {for: [resource_name, attribute].join('_')})
       end
     end
 
-    context 'when fields_for used' do
+    context 'inputs' do
+
+      context "one custom input class (passed as a string)" do
+        let(:custom_class) {"blue-and-white-stripes"}
+        subject { builder.send(method, :name, class: custom_class) }
+
+        specify 'adds custom class to input when provided' do
+          expect(subject).to have_tag("#{element}.#{custom_class}", with: {type: type}.compact)
+        end
+      end
+
+      context "multiple custom input classes (passed as an array)" do
+        let(:custom_classes) {["blue-and-white-stripes", "yellow-spots"]}
+        subject { builder.send(method, :name, class: custom_classes) }
+
+        specify 'adds multiple custom classes to input when provided' do
+          expect(subject).to have_tag("#{element}.#{custom_classes.join(".")}", with: {type: type}.compact)
+        end
+      end
+
+      context "custom html attributes" do
+
+        let(:custom_attributes) {method.eql?(:text_area) ? {cols: '100'} : {size: '100'}}
+
+        subject {builder.send(method, :name, nil, custom_attributes.dup)}
+
+        specify 'adds all supplied html attributes' do
+          expect(subject).to have_tag(element, with: custom_attributes)
+        end
+
+      end
+
+    end
+
+    context 'labels' do
+
+      context "one custom label attributes" do
+        let(:label_options) {{"data-some-value" => "XYZ", lang: "en"}}
+        subject { builder.send(method, :name, label_options: label_options) }
+
+        specify 'adds custom class to input when provided' do
+          expect(subject).to have_tag("label", with: label_options)
+        end
+      end
+
+    end
+
+    context 'hints' do
+
+      subject {builder.send(method, :ni_number)}
+      let(:hint_text) {I18n.t('helpers.hint.person.ni_number')}
+
+      specify 'should include hint text' do
+        expect(subject).to have_tag('.form-group > label.form-label') do |label|
+          expect(label).to have_tag("span.form-hint", text: hint_text)
+        end
+      end
+
+    end
+
+    context 'fields_for' do
       it 'outputs label and input with correct ids' do
         output = builder.fields_for(:address, Address.new) do |f|
           f.send method, :postcode
