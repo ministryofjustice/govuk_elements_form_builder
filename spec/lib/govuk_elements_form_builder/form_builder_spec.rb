@@ -355,166 +355,152 @@ RSpec.describe GovukElementsFormBuilder::FormBuilder do
 
     end
 
-    it 'outputs yes/no choices when no choices specified, and adds "inline" class to fieldset when passed "inline: true"' do
-      output = builder.radio_button_fieldset :has_user_account, inline: true
-      expect_equal output, [
-        '<div class="form-group">',
-        '<fieldset class="inline">',
-        '<legend>',
-        '<span class="form-label-bold">',
-        'Do you already have a personal user account?',
-        '</span>',
-        '</legend>',
-        '<div class="multiple-choice">',
-        '<input type="radio" value="yes" name="person[has_user_account]" id="person_has_user_account_yes" />',
-        '<label for="person_has_user_account_yes">',
-        'Yes',
-        '</label>',
-        '</div>',
-        '<div class="multiple-choice">',
-        '<input type="radio" value="no" name="person[has_user_account]" id="person_has_user_account_no" />',
-        '<label for="person_has_user_account_no">',
-        'No',
-        '</label>',
-        '</div>',
-        '</fieldset>',
-        '</div>'
-      ]
-    end
+    context 'when no choices specified' do
 
-    it 'outputs markup with support for revealing panels' do
-      output = builder.radio_button_fieldset :location do |fieldset|
-        fieldset.radio_input(:england)
-        fieldset.radio_input(:other) {
-          fieldset.text_field :location_other
-        }
+      subject {builder.radio_button_fieldset(:has_user_account)}
+
+      specify 'outputs yes/no choices' do
+        expect(subject).to have_tag('.form-group > fieldset') do |fieldset|
+          expect(fieldset).to have_tag('div.multiple-choice > input', count: 2, with: {type: 'radio'})
+          expect(fieldset).to have_tag('input', with: {value: 'no'})
+          expect(fieldset).to have_tag('input', with: {value: 'yes'})
+        end
       end
 
-      expect_equal output, [
-      '<div class="form-group">',
-        '<fieldset>',
-        '<legend>',
-        '<span class="form-label-bold">',
-        'Where do you live?',
-        '</span>',
-        '<span class="form-hint">',
-        'Select from these options because you answered you do not reside in England, Wales, or Scotland',
-        '</span>',
-        '</legend>',
-        '<div class="multiple-choice">',
-        '<input type="radio" value="england" name="person[location]" id="person_location_england" />',
-        '<label for="person_location_england">',
-        'England',
-        '</label>',
-        '</div>',
-        '<div class="multiple-choice" data-target="location_other_panel">',
-        '<input type="radio" value="other" name="person[location]" id="person_location_other" />',
-        '<label for="person_location_other">',
-        'Other location',
-        '</label>',
-        '</div>',
-        '<div class="panel panel-border-narrow js-hidden" id="location_other_panel">',
-        '<div class="form-group">',
-        '<label class="form-label" for="person_location_other">',
-        'Please enter your location',
-        '</label>',
-        '<input class="form-control" type="text" name="person[location_other]" id="person_location_other" />',
-        '</div>',
-        '</div>',
-        '</fieldset>',
-        '</div>'
-      ]
-    end
-
-    it 'outputs markup with support for revealing panels with specific ID' do
-      output = builder.radio_button_fieldset :location do |fieldset|
-        fieldset.radio_input(:england)
-        fieldset.radio_input(:other, panel_id: 'another_location_input')
+      specify 'yes/no choices have labels' do
+        expect(subject).to have_tag('.form-group > fieldset') do |fieldset|
+          expect(fieldset).to have_tag('label', text: 'Yes', with: {for: 'person_has_user_account_yes'})
+          expect(fieldset).to have_tag('label', text: 'No', with: {for: 'person_has_user_account_no'})
+        end
       end
 
-      expect(output).to match(/<div class="multiple-choice" data-target="another_location_input">/)
     end
 
-    it 'propagates html attributes down to the legend inner span if any provided, appending to the defaults' do
-      output = builder.radio_button_fieldset :has_user_account, inline: true, legend_options: {class: 'visuallyhidden', lang: 'en'}
-      expect(output).to match(/<legend><span class="form-label-bold visuallyhidden" lang="en">/)
-    end
+    context 'adds inline class to fieldset when inline option passed' do
+      subject {builder.radio_button_fieldset(:has_user_account, inline: true)}
 
-    it 'can override the legend text' do
-      output = builder.radio_button_fieldset :has_user_account, inline: true, legend_options: { text: 'A custom legend' }
-      expect(output).to match(/<legend><span class="form-label-bold">A custom legend<\/span>/)
-    end
-
-    context 'with a couple associated cases' do
-      let(:case_1) { Case.new(id: 1, name: 'Case One')  }
-      let(:case_2) { Case.new(id: 2, name: 'Case Two')  }
-      let(:cases) { [case_1, case_2] }
-
-      it 'accepts value_method and text_method to better control generated HTML' do
-        output = builder.radio_button_fieldset :case_id, choices: cases, value_method: :id, text_method: :name, inline: true
-        expect_equal output, [
-                       '<div class="form-group">',
-                       '<fieldset class="inline">',
-                       '<legend>',
-                       '<span class="form-label-bold">',
-                       'Case',
-                       '</span>',
-                       '</legend>',
-                       '<div class="multiple-choice">',
-                       '<input type="radio" value="1" name="person[case_id]" id="person_case_id_1" />',
-                       '<label for="person_case_id_1">',
-                       'Case One',
-                       '</label>',
-                       '</div>',
-                       '<div class="multiple-choice">',
-                       '<input type="radio" value="2" name="person[case_id]" id="person_case_id_2" />',
-                       '<label for="person_case_id_2">',
-                       'Case Two',
-                       '</label>',
-                       '</div>',
-                       '</fieldset>',
-                       '</div>'
-                     ]
-
+      specify "fieldset should have 'inline' class" do
+        expect(subject).to have_tag('.form-group > fieldset.inline')
       end
     end
 
-    context 'the resource is invalid' do
-      let(:resource) { Person.new.tap { |p| p.valid? } }
+    context 'revealing panels' do
 
-      it 'outputs error messages' do
-        output = builder.radio_button_fieldset :gender
-        expect_equal output, [
-                       '<div class="form-group form-group-error" id="error_person_gender">',
-                       '<fieldset>',
-                       '<legend>',
-                       '<span class="form-label-bold">',
-                       'Gender',
-                       '</span>',
-                       '<span class="error-message">',
-                       'Gender is required',
-                       '</span>',
-                       '<span class="form-hint">',
-                       'Select from these options',
-                       '</span>',
-                       '</legend>',
-                       '<div class="multiple-choice">',
-                       '<input aria-describedby="error_message_person_gender_yes" type="radio" value="yes" name="person[gender]" id="person_gender_yes" />',
-                       '<label for="person_gender_yes">',
-                       'Yes',
-                       '</label>',
-                       '</div>',
-                       '<div class="multiple-choice">',
-                       '<input aria-describedby="error_message_person_gender_no" type="radio" value="no" name="person[gender]" id="person_gender_no" />',
-                       '<label for="person_gender_no">',
-                       'No',
-                       '</label>',
-                       '</div>',
-                       '</fieldset>',
-                       '</div>'
-                     ]
+      let(:other_input) {:location_other}
+      let(:other_input_panel) {:location_other_panel}
+      let(:other_input_label) { I18n.t('label.location_other') }
+
+      subject do
+        builder.radio_button_fieldset(:location) do |fieldset|
+          fieldset.radio_input(:england)
+          fieldset.radio_input(:other) {
+            fieldset.text_field other_input
+          }
+        end
+      end
+
+      specify "there should be an 'other' entry" do
+        target_options = {'data-target' => other_input_panel}
+        expect(subject).to have_tag('.multiple-choice', with: target_options) do
+          expect(subject).to have_tag('input', with: {
+            type: 'radio',
+            value: 'other'
+          })
+        end
+      end
+
+      specify "there should be a hidden panel for the 'other' entry" do
+        expect(subject).to have_tag(".panel.js-hidden", with: {id: other_input_panel})
+      end
+
+      specify 'the hidden panel should contain a text input' do
+        expect(subject).to have_tag(".panel.js-hidden") do |panel|
+          expect(panel).to have_tag('input.form-control', with: {
+            type: 'text',
+            name: "person[#{other_input}]"
+          })
+        end
+      end
+
+      specify "the hidden 'other' input should be labelled correctly" do
+        expect(subject).to have_tag(".panel.js-hidden") do |panel|
+          expect(panel).to have_tag('label.form-label', with: {
+            for: "person_#{other_input}"
+          })
+        end
       end
     end
+
+    context 'revealing panels with a specific id' do
+
+      let(:custom_div) {"a-customisable-div"}
+
+      subject do
+        builder.radio_button_fieldset :location do |fieldset|
+          fieldset.radio_input(:england)
+          fieldset.radio_input(:other, panel_id: custom_div)
+        end
+      end
+
+      specify 'outputs markup with support for revealing panels with specific id' do
+        expect(subject).to have_tag('.multiple-choice', with: {"data-target" => custom_div})
+      end
+
+    end
+
+    context 'legend options' do
+      let(:custom_class) {"bright-pink"}
+      let(:language) {"en"}
+
+      subject do
+        builder.radio_button_fieldset :has_user_account, inline: true, legend_options: {class: custom_class, lang: language}
+      end
+
+      specify 'should be propagated down to the inner legend when provided' do
+        expect(subject).to have_tag("legend > span.form-label-bold.#{custom_class}", with: {lang: language})
+      end
+
+    end
+
+    context 'custom names and values' do
+      let(:cases) {[ Case.new(id: 18, name: 'Case One'), Case.new(id: 19, name: 'Case Two')]}
+      subject {builder.radio_button_fieldset(:case_id, choices: cases, value_method: :id, text_method: :name)}
+
+      specify 'name and value should match provided options' do
+        cases.each do |kase|
+
+          expect(subject).to have_tag("input#person_case_id_#{kase.id}", with: {
+            value: kase.id,
+            type: 'radio'
+          })
+
+          expect(subject).to have_tag('label', text: kase.name, with: {
+            for: "person_case_id_#{kase.id}"
+          })
+
+        end
+      end
+    end
+
+    context 'when the resource is invalid' do
+      let(:resource) {Person.new}
+      let(:error_message) {"Gender is required"}
+      subject {builder.radio_button_fieldset :gender}
+
+      before do
+        resource.valid?
+      end
+
+      specify 'the form group should have error classes' do
+        expect(subject).to have_tag('.form-group.form-group-error')
+      end
+
+      specify 'the form group should have error messages' do
+        expect(subject).to have_tag('.form-group-error span.error-message', text: error_message)
+      end
+
+    end
+
   end
 
   describe '#check_box_fieldset' do
