@@ -16,26 +16,6 @@ RSpec.describe GovukElementsFormBuilder::FormBuilder do
   let(:resource_name) {:person}
   let(:builder) {described_class.new resource_name, resource, helper, {}}
 
-  def expect_equal output, expected
-    split_output = output.gsub(">\n</textarea>", ' />').split("<").join("\n<").split(">").join(">\n").squeeze("\n").strip + '>'
-    split_expected = expected.join("\n")
-    expect(split_output).to eq split_expected
-  end
-
-  def element_for(method)
-    method == :text_area ? 'textarea' : 'input'
-  end
-
-  def type_for(method, type)
-    method == :text_area ? '' : %'type="#{type}" '
-  end
-
-  def html_attributes(hash)
-    if  hash.present?
-      hash.map{|k,v| %'#{k}="#{v}" '}.join(' ')
-    end
-  end
-
   shared_examples_for 'input field' do |method, type|
 
     let(:element) {method.eql?(:text_area) ? "textarea" : "input"}
