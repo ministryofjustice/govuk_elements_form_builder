@@ -195,9 +195,7 @@ RSpec.describe GovukElementsFormBuilder::FormBuilder do
       end
 
       context 'nested objects (fields_for)' do
-
         context 'nested once' do
-
           let(:address) {Address.new.tap{|a| a.valid?}}
 
           subject do
@@ -219,9 +217,7 @@ RSpec.describe GovukElementsFormBuilder::FormBuilder do
               name: "person[address_attributes][postcode]"
             })
           end
-
         end
-
 
         context 'nested twice' do
           let(:country) {Country.new.tap{|c| c.valid?}}
@@ -253,46 +249,11 @@ RSpec.describe GovukElementsFormBuilder::FormBuilder do
               name: "person[address_attributes][country_attributes][name]"
             })
           end
-
         end
-
       end
+
     end
 
-  end
-
-  context 'when mixing the rendering order of nested builders' do
-    let(:method) { :text_field }
-    let(:type) { :text }
-    it 'outputs error messages in span inside label' do
-      resource.address = Address.new
-      resource.address.valid?
-      resource.valid?
-
-      # Render the postcode first
-      builder.fields_for(:address) do |address|
-        address.text_field :postcode
-      end
-      output = builder.text_field :name
-
-      expected = expected_error_html :text_field, :text, 'person_name',
-        'person[name]', 'Full name', 'Full name is required'
-      expect_equal output, expected
-    end
-  end
-
-  def expected_error_html method, type, attribute, name_value, label, error
-    [
-      %'<div class="form-group form-group-error" id="error_#{attribute}">',
-      %'<label class="form-label" for="#{attribute}">',
-      label,
-      %'<span class="error-message" id="error_message_#{attribute}">',
-      error,
-      '</span>',
-      '</label>',
-      %'<#{element_for(method)} aria-describedby="error_message_#{attribute}" class="form-control form-control-error" #{type_for(method, type)}name="#{name_value}" id="#{attribute}" />',
-      '</div>'
-    ]
   end
 
   describe '#text_field' do
