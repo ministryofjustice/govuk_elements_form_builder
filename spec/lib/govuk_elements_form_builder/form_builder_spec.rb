@@ -296,51 +296,7 @@ RSpec.describe GovukElementsFormBuilder::FormBuilder do
     include_examples 'input field', :url_field, :url
   end
 
-  describe '#revealing_panel' do
-    let(:pretty_output) { HtmlBeautifier.beautify output }
-
-    it 'outputs revealing panel markup' do
-      output = builder.radio_button_fieldset :location do |fieldset|
-        fieldset.revealing_panel(:location_panel) do |panel|
-          panel.text_field :location_other
-          panel.text_field :address
-        end
-      end
-
-      expect_equal output, [
-        '<div class="form-group">',
-        '<fieldset>',
-        '<legend>',
-        '<span class="form-label-bold">',
-        'Where do you live?',
-        '</span>',
-        '<span class="form-hint">',
-        'Select from these options because you answered you do not reside in England, Wales, or Scotland',
-        '</span>',
-        '</legend>',
-        '<div class="panel panel-border-narrow js-hidden" id="location_panel">',
-        '<div class="form-group">',
-        '<label class="form-label" for="person_location_other">',
-        'Please enter your location',
-        '</label>',
-        '<input class="form-control" type="text" name="person[location_other]" id="person_location_other" />',
-        '</div>',
-        '<div class="form-group">',
-        '<label class="form-label" for="person_address">',
-        'Address',
-        '</label>',
-        '<input class="form-control" type="text" name="person[address]" id="person_address" />',
-        '</div>',
-        '</div>',
-        '</fieldset>',
-        '</div>'
-      ]
-    end
-  end
-
   describe '#radio_button_fieldset' do
-
-    let(:pretty_output) { HtmlBeautifier.beautify output }
 
     context 'outputs radio buttons in a stacked layout' do
       let(:locations) {[:ni, :isle_of_man_channel_islands, :british_abroad]}
