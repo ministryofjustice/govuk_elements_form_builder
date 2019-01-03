@@ -111,90 +111,151 @@ RSpec.describe GovukElementsFormBuilder::FormBuilder do
     end
 
     context 'fields_for' do
-      it 'outputs label and input with correct ids' do
-        output = builder.fields_for(:address, Address.new) do |f|
-          f.send method, :postcode
+
+      let(:attribute) {:postcode}
+
+      subject do
+        builder.fields_for(:address, Address.new) do |f|
+          f.send method, attribute
         end
-        expect_equal output, [
-          '<div class="form-group">',
-          '<label class="form-label" for="person_address_attributes_postcode">',
-          'Postcode',
-          '</label>',
-          %'<#{element_for(method)} class="form-control" #{type_for(method, type)}name="person[address_attributes][postcode]" id="person_address_attributes_postcode" />',
-          '</div>'
-        ]
       end
+
+      specify 'should output input with nested form attributes' do
+        expect(subject).to have_tag("#{element}#person_address_attributes_#{attribute}", with: {
+          name: "person[address_attributes][#{attribute}]"
+        })
+      end
+
+      specify 'should display a label for the nested field' do
+        expect(subject).to have_tag('label', with: {
+          for: "person_address_attributes_#{attribute}"
+        })
+      end
+
     end
 
     context 'when resource is a not a persisted model' do
-      let(:resource) { Report.new }
-      let(:builder) { described_class.new :report, resource, helper, {} }
-      it "##{method} does not fail" do
-        expect { builder.send method, :name }.not_to raise_error
+      let(:resource) {Report.new}
+      subject {described_class.new(:report, resource, helper, {})}
+
+      it "##{method} does not raise errors" do
+        expect {subject.send method, :name}.not_to raise_error
       end
     end
 
-    context 'when validation error on object' do
-      it 'outputs error message in span inside label' do
-        resource.valid?
-        output = builder.send method, :name
-        expected = expected_error_html method, type, 'person_name',
-          'person[name]', 'Full name', 'Full name is required'
-        expect_equal output, expected
-      end
+    context 'validation errors' do
 
-      it 'outputs custom error message format in span inside label' do
-        translations = YAML.load(%'
-            errors:
-              format: "%{message}"
-            activemodel:
-              errors:
-                models:
-                  person:
-                    attributes:
-                      name:
-                        blank: "Enter your full name"
-        ')
-        with_translations(:en, translations) do
-          resource.valid?
-          output = builder.send method, :name
-          expected = expected_error_html method, type, 'person_name',
-            'person[name]', 'Name', 'Enter your full name'
-          expect_equal output, expected
-        end
-      end
-    end
+      let(:attribute) {:name}
+      subject {builder.send method, attribute}
+      before {resource.valid?}
 
-    context 'when validation error on child object' do
-      it 'outputs error message in span inside label' do
-        resource.address = Address.new
-        resource.address.valid?
+      specify 'error message is displayed within the label' do
 
-        output = builder.fields_for(:address) do |f|
-          f.send method, :postcode
-        end
-
-        expected = expected_error_html method, type, 'person_address_attributes_postcode',
-          'person[address_attributes][postcode]', 'Postcode', 'Postcode is required'
-        expect_equal output, expected
-      end
-    end
-
-    context 'when validation error on twice nested child object' do
-      it 'outputs error message in span inside label' do
-        resource.address = Address.new
-        resource.address.country = Country.new
-        resource.address.country.valid?
-
-        output = builder.fields_for(:address) do |address|
-          address.fields_for(:country) do |country|
-            country.send method, :name
+        expect(subject).to have_tag("#error_person_#{attribute}.form-group-error") do |fge|
+          expect(fge).to have_tag('label', text: /Full name/, with: {for: "person_#{attribute}"}) do |label|
+            expect(label).to have_tag('span', text: 'Full name is required')
           end
         end
+      end
 
-        expected = expected_error_html method, type, 'person_address_attributes_country_attributes_name',
-          'person[address_attributes][country_attributes][name]', 'Country', 'Country is required'
-        expect_equal output, expected
+      context 'custom translations' do
+
+        let(:custom_translations) do
+          YAML.load(
+            <<~TRANSLATION
+              errors:
+                format: "%{message}"
+              activemodel:
+                errors:
+                  models:
+                    person:
+                      attributes:
+                        name:
+                          blank: "Enter your full name"
+            TRANSLATION
+          )
+        end
+
+        let(:message) {I18n.t('activemodel.errors.models.person.attributes.name.blank')}
+
+        specify 'should use the appropriate error messages as defined by the translation' do
+          with_translations(:en, custom_translations) do
+
+            # we need to validate the resource *after* having
+            # loaded the translationsk, so it can't be done in
+            # a before block
+            resource.valid?
+
+            expect(builder.send(method, attribute)).to have_tag("#error_person_#{attribute}.form-group-error") do |fge|
+              expect(fge).to have_tag('span', text: message)
+            end
+
+          end
+        end
+      end
+
+      context 'nested objects (fields_for)' do
+
+        context 'nested once' do
+
+          let(:address) {Address.new.tap{|a| a.valid?}}
+
+          subject do
+            builder.fields_for(:address) do |a|
+              a.send(method, :postcode)
+            end
+          end
+
+          before {resource.address = address}
+
+          specify 'error message should be in label-contained span' do
+            expect(subject).to have_tag('label', text: 'Postcode is required', with: {
+              for: 'person_address_attributes_postcode'
+            })
+          end
+
+          specify 'input should have error attributes' do
+            expect(subject).to have_tag(element, with: {
+              name: "person[address_attributes][postcode]"
+            })
+          end
+
+        end
+
+
+        context 'nested twice' do
+          let(:country) {Country.new.tap{|c| c.valid?}}
+          let(:resource_address) do
+            Address.new.tap do |address|
+              address.country = country
+              address.country.valid?
+            end
+          end
+
+          subject do
+            builder.fields_for(:address) do |address|
+              address.fields_for(:country) do |country|
+                country.send method, :name
+              end
+            end
+          end
+
+          before {resource.address = resource_address}
+
+          specify 'outputs error message label-contained span' do
+            expect(subject).to have_tag('label', text: 'Country is required', with: {
+              for: 'person_address_attributes_country_attributes_name'
+            })
+          end
+
+          specify 'input should have error attributes' do
+            expect(subject).to have_tag(element, with: {
+              name: "person[address_attributes][country_attributes][name]"
+            })
+          end
+
+        end
+
       end
     end
 
