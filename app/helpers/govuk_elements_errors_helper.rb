@@ -88,7 +88,7 @@ module GovukElementsErrorsHelper
   def self.error_summary_div &block
     content_tag(:div,
         class: 'error-summary',
-        role: 'group',
+        role: 'alert',
         aria: {
           labelledby: 'error-summary-heading'
         },
@@ -98,7 +98,7 @@ module GovukElementsErrorsHelper
   end
 
   def self.error_summary_heading text
-    content_tag :h1,
+    content_tag :h2,
       text,
       id: 'error-summary-heading',
       class: 'heading-medium error-summary-heading'
