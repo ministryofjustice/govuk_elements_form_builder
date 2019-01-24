@@ -51,9 +51,19 @@ RSpec.describe GovukElementsErrorsHelper, type: :helper do
       expect(output).to_not be_nil
     end
 
+    it 'expects the `div.error-summary` to have specific attributes' do
+      expect(
+        pretty_output
+      ).to have_tag('div.error-summary', with: {
+        role: 'alert',
+        tabindex: '-1',
+        'aria-labelledby': 'error-summary-heading',
+      })
+    end
+
     it 'outputs title and description' do
       expect(pretty_output).to have_tag('div.error-summary') do
-        with_tag 'h1#error-summary-heading', summary_title
+        with_tag 'h2#error-summary-heading', summary_title
         with_tag 'p', summary_description
       end
     end
@@ -100,7 +110,7 @@ RSpec.describe GovukElementsErrorsHelper, type: :helper do
 
     it 'outputs title and description' do
       expect(pretty_output).to have_tag('div.error-summary') do
-        with_tag 'h1#error-summary-heading', summary_title
+        with_tag 'h2#error-summary-heading', summary_title
         with_tag 'p', summary_description
       end
     end
@@ -143,7 +153,7 @@ RSpec.describe GovukElementsErrorsHelper, type: :helper do
 
     it 'outputs title and description' do
       expect(pretty_output).to have_tag('div.error-summary') do
-        with_tag 'h1#error-summary-heading', summary_title
+        with_tag 'h2#error-summary-heading', summary_title
         with_tag 'p', summary_description
       end
     end
