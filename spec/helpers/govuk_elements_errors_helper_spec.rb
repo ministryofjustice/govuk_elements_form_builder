@@ -4,9 +4,6 @@ RSpec.describe GovukElementsErrorsHelper, type: :helper do
   include TranslationHelper
 
   let(:summary_title) { 'Message to alert the user to a problem goes here' }
-  let(:summary_description) do
-    'Optional description of the errors and how to correct them'
-  end
   let(:translations) do
     YAML.load(%'
       errors:
@@ -33,7 +30,6 @@ RSpec.describe GovukElementsErrorsHelper, type: :helper do
     described_class.error_summary(
       resource,
       summary_title,
-      summary_description
     )
   end
 
@@ -51,36 +47,30 @@ RSpec.describe GovukElementsErrorsHelper, type: :helper do
       expect(output).to_not be_nil
     end
 
-    it 'expects the `div.error-summary` to have specific attributes' do
+    it 'expects the `div.govuk-error-summary` to have specific attributes' do
       expect(
         pretty_output
-      ).to have_tag('div.error-summary', with: {
+      ).to have_tag('div.govuk-error-summary', with: {
         role: 'alert',
         tabindex: '-1',
-        'aria-labelledby': 'error-summary-heading',
+        'aria-labelledby': 'error-summary-title',
+        'data-module': 'error-summary',
       })
     end
 
-    it 'outputs title and description' do
-      expect(pretty_output).to have_tag('div.error-summary') do
-        with_tag 'h2#error-summary-heading', summary_title
-        with_tag 'p', summary_description
-      end
-    end
-
     it 'outputs the specific error message' do
-      expect(pretty_output).to have_tag('div.error-summary') do
-        with_tag 'ul.error-summary-list' do
-          with_tag 'a[href="#error_person_name"]', 'Full name is required'
+      expect(pretty_output).to have_tag('div.govuk-error-summary') do
+        with_tag 'ul.govuk-error-summary__list' do
+          with_tag 'a[href="#person_name_error"]', 'Full name is required'
         end
       end
     end
 
     it 'uses translation for specific error message' do
       with_translations(:cy, translations) do
-        expect(pretty_output).to have_tag('div.error-summary') do
-          with_tag 'ul.error-summary-list' do
-            with_tag 'a[href="#error_person_name"]', 'Mae angen enw llawn'
+        expect(pretty_output).to have_tag('div.govuk-error-summary') do
+          with_tag 'ul.govuk-error-summary__list' do
+            with_tag 'a[href="#person_name_error"]', 'Mae angen enw llawn'
           end
         end
       end
@@ -90,9 +80,9 @@ RSpec.describe GovukElementsErrorsHelper, type: :helper do
       let(:resource) { Steps::Appeal::Penalty.new.tap { |p| p.valid? } }
 
       it 'outputs the specific error message with correct anchoring' do
-        expect(pretty_output).to have_tag('div.error-summary') do
-          with_tag 'ul.error-summary-list' do
-            with_tag 'a[href="#error_steps_appeal_penalty_amount"]', 'Amount is required'
+        expect(pretty_output).to have_tag('div.govuk-error-summary') do
+          with_tag 'ul.govuk-error-summary__list' do
+            with_tag 'a[href="#steps_appeal_penalty_amount_error"]', 'Amount is required'
           end
         end
       end
@@ -108,33 +98,26 @@ RSpec.describe GovukElementsErrorsHelper, type: :helper do
       expect(output).to_not be_nil
     end
 
-    it 'outputs title and description' do
-      expect(pretty_output).to have_tag('div.error-summary') do
-        with_tag 'h2#error-summary-heading', summary_title
-        with_tag 'p', summary_description
-      end
-    end
-
     it 'outputs the specific error message' do
-      expect(pretty_output).to have_tag('div.error-summary') do
-        with_tag 'ul.error-summary-list' do
-          with_tag(
-            'a[href="#error_person_address_attributes_postcode"]',
-            'Postcode is required'
-          )
+      expect(pretty_output).to have_tag('div.govuk-error-summary') do
+        with_tag 'div.govuk-error-summary__body' do
+          with_tag 'ul.govuk-error-summary__list' do
+            with_tag(
+              'a[href="#person_address_attributes_postcode_error"]',
+              'Postcode is required'
+            )
+          end
         end
       end
     end
 
     it 'uses translation for specific error message' do
       with_translations(:cy, translations) do
-        expect(pretty_output).to have_tag('div.error-summary') do
-          with_tag 'ul.error-summary-list' do
-            with_tag(
-              'a[href="#error_person_address_attributes_postcode"]',
-              'Mae angen cod post'
-            )
-          end
+        expect(pretty_output).to have_tag('ul.govuk-error-summary__list') do
+          with_tag(
+            'a[href="#person_address_attributes_postcode_error"]',
+            'Mae angen cod post'
+          )
         end
       end
     end
@@ -151,18 +134,11 @@ RSpec.describe GovukElementsErrorsHelper, type: :helper do
       expect(output).to_not be_nil
     end
 
-    it 'outputs title and description' do
-      expect(pretty_output).to have_tag('div.error-summary') do
-        with_tag 'h2#error-summary-heading', summary_title
-        with_tag 'p', summary_description
-      end
-    end
-
     it 'outputs the specific error message' do
-      expect(pretty_output).to have_tag('div.error-summary') do
-        with_tag 'ul.error-summary-list' do
+      expect(pretty_output).to have_tag('div.govuk-error-summary') do
+        with_tag 'ul.govuk-error-summary__list' do
           with_tag(
-            'a[href="#error_person_address_attributes_country_attributes_name"]',
+            'a[href="#person_address_attributes_country_attributes_name_error"]',
             'Country is required'
           )
         end
@@ -171,10 +147,10 @@ RSpec.describe GovukElementsErrorsHelper, type: :helper do
 
     it 'uses translation for specific error message' do
       with_translations(:cy, translations) do
-        expect(pretty_output).to have_tag('div.error-summary') do
-          with_tag 'ul.error-summary-list' do
+        expect(pretty_output).to have_tag('div.govuk-error-summary') do
+          with_tag 'ul.govuk-error-summary__list' do
             with_tag(
-              'a[href="#error_person_address_attributes_country_attributes_name"]',
+              'a[href="#person_address_attributes_country_attributes_name_error"]',
               'Mae angen Gwlad'
             )
           end
@@ -188,7 +164,6 @@ RSpec.describe GovukElementsErrorsHelper, type: :helper do
       output = described_class.error_summary(
         Person.new,
         summary_title,
-        summary_description
       )
       expect(output).to eq nil
     end
@@ -203,7 +178,7 @@ RSpec.describe GovukElementsErrorsHelper, type: :helper do
     end
 
     it 'produces error message, and does not get stuck in infinite loop' do
-      expect(pretty_output).to include('<a href="#error_case_name">Name is required</a>')
+      expect(pretty_output).to include('<a href="#case_name_error">Name is required</a>')
     end
   end
 
@@ -213,9 +188,8 @@ RSpec.describe GovukElementsErrorsHelper, type: :helper do
     end
 
     it 'creates separate error messages for resources in array' do
-      expect(pretty_output).to include('<a href="#error_case_name">Name is required</a>')
-      expect(pretty_output).to include('<a href="#error_case_case_attributes_name">Name is required</a>')
+      expect(pretty_output).to include('<a href="#case_name_error">Name is required</a>')
+      expect(pretty_output).to include('<a href="#case_case_attributes_name_error">Name is required</a>')
     end
   end
-
 end

@@ -5,11 +5,10 @@ module GovukElementsErrorsHelper
     include ActionView::Helpers::TagHelper
   end
 
-  def self.error_summary object, heading, description
+  def self.error_summary object, heading
     return unless errors_exist? object
     error_summary_div do
       error_summary_heading(heading) +
-      error_summary_description(description) +
       error_summary_list(object)
     end
   end
@@ -86,13 +85,15 @@ module GovukElementsErrorsHelper
   end
 
   def self.error_summary_div &block
-    content_tag(:div,
-        class: 'error-summary',
-        role: 'alert',
-        aria: {
-          labelledby: 'error-summary-heading'
-        },
-        tabindex: '-1') do
+    attrs = {
+      class: 'govuk-error-summary',
+      aria: { labelledby: 'error-summary-title' },
+      data: { module: 'error-summary' },
+      role: 'alert',
+      tabindex: '-1',
+    }.freeze
+
+    content_tag(:div, attrs) do
       yield block
     end
   end
@@ -100,24 +101,22 @@ module GovukElementsErrorsHelper
   def self.error_summary_heading text
     content_tag :h2,
       text,
-      id: 'error-summary-heading',
-      class: 'heading-medium error-summary-heading'
-  end
-
-  def self.error_summary_description text
-    content_tag :p, text
+      id: 'error-summary-title',
+      class: 'govuk-error-summary__title'
   end
 
   def self.error_summary_list object
-    content_tag(:ul, class: 'error-summary-list') do
-      child_to_parents = child_to_parent(object)
-      messages = error_summary_messages(object, child_to_parents)
+    content_tag(:div, class: 'govuk-error-summary__body') do
+      content_tag(:ul, class: 'govuk-list govuk-error-summary__list') do
+        child_to_parents = child_to_parent(object)
+        messages = error_summary_messages(object, child_to_parents)
 
-      messages << children_with_errors(object).map do |child|
-        error_summary_messages(child, child_to_parents)
+        messages << children_with_errors(object).map do |child|
+          error_summary_messages(child, child_to_parents)
+        end
+
+        messages.flatten.join('').html_safe
       end
-
-      messages.flatten.join('').html_safe
     end
   end
 
@@ -138,7 +137,7 @@ module GovukElementsErrorsHelper
   end
 
   def self.link_to_error object_prefixes, attribute
-    ['#error', *object_prefixes, attribute].join('_')
+    [*object_prefixes, attribute, 'error'].join('_').prepend('#')
   end
 
   def self.default_label attribute
@@ -185,7 +184,6 @@ module GovukElementsErrorsHelper
 
   private_class_method :error_summary_div
   private_class_method :error_summary_heading
-  private_class_method :error_summary_description
   private_class_method :error_summary_messages
 
 end
