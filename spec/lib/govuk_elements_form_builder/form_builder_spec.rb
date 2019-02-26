@@ -439,6 +439,11 @@ RSpec.describe GovukElementsFormBuilder::FormBuilder do
       expect(output).to match(/<legend><span class="form-label-bold visuallyhidden" lang="en">/)
     end
 
+    it 'can override the legend text' do
+      output = builder.radio_button_fieldset :has_user_account, inline: true, legend_options: { text: 'A custom legend' }
+      expect(output).to match(/<legend><span class="form-label-bold">A custom legend<\/span>/)
+    end
+
     context 'with a couple associated cases' do
       let(:case_1) { Case.new(id: 1, name: 'Case One')  }
       let(:case_2) { Case.new(id: 2, name: 'Case Two')  }
@@ -647,6 +652,13 @@ RSpec.describe GovukElementsFormBuilder::FormBuilder do
         f.check_box_fieldset :waste_transport, [:animal_carcasses, :mines_quarries, :farm_agricultural], legend_options: {class: 'visuallyhidden', lang: 'en'}
       end
       expect(output).to match(/<legend><span class="form-label-bold visuallyhidden" lang="en">/)
+    end
+
+    it 'can override the legend text' do
+      output = builder.fields_for(:waste_transport) do |f|
+        f.check_box_fieldset :waste_transport, [:animal_carcasses, :mines_quarries, :farm_agricultural], legend_options: { text: 'A custom legend' }
+      end
+      expect(output).to match(/<legend><span class="form-label-bold">A custom legend<\/span>/)
     end
   end
 

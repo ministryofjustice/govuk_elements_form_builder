@@ -230,10 +230,12 @@ module GovukElementsFormBuilder
     end
 
     def fieldset_legend attribute, options
+      legend_text = options.fetch(:legend_options, {}).delete(:text)
+
       legend = content_tag(:legend) do
         tags = [content_tag(
                   :span,
-                  fieldset_text(attribute),
+                  legend_text || fieldset_text(attribute),
                   merge_attributes(options[:legend_options], default: {class: 'form-label-bold'})
                 )]
 
