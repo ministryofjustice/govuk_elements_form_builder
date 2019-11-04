@@ -8,7 +8,7 @@ RSpec.describe GovukElementsFormBuilder::FormBuilder do
   include TranslationHelper
 
   it "should have a version" do
-    expect(GovukElementsFormBuilder::VERSION).to eq("1.3.0")
+    expect(GovukElementsFormBuilder::VERSION).to eq("1.3.1")
   end
 
   let(:helper) { TestHelper.new }
