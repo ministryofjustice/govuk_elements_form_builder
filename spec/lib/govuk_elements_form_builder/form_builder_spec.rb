@@ -24,9 +24,9 @@ RSpec.describe GovukElementsFormBuilder::FormBuilder do
     subject {builder.send(method, attribute)}
 
     specify 'outputs label and input wrapped in div' do
-      expect(subject).to have_tag('div.form-group') do |fg|
-        expect(fg).to have_tag(element, with: {name: "#{resource_name}[#{attribute}]"})
-        expect(fg).to have_tag("label.form-label", with: {for: [resource_name, attribute].join('_')})
+      expect(subject).to have_tag('div.form-group') do
+        with_tag(element, with: {name: "#{resource_name}[#{attribute}]"})
+        with_tag("label.form-label", with: {for: [resource_name, attribute].join('_')})
       end
     end
 
@@ -83,8 +83,8 @@ RSpec.describe GovukElementsFormBuilder::FormBuilder do
       let(:hint_text) {I18n.t('helpers.hint.person.ni_number')}
 
       specify 'should include hint text' do
-        expect(subject).to have_tag('.form-group > label.form-label') do |label|
-          expect(label).to have_tag("span.form-hint", text: hint_text)
+        expect(subject).to have_tag('.form-group > label.form-label') do
+          with_tag("span.form-hint", text: hint_text)
         end
       end
 
@@ -130,10 +130,9 @@ RSpec.describe GovukElementsFormBuilder::FormBuilder do
       before {resource.valid?}
 
       specify 'error message is displayed within the label' do
-
-        expect(subject).to have_tag("#error_person_#{attribute}.form-group-error") do |fge|
-          expect(fge).to have_tag('label', text: /Full name/, with: {for: "person_#{attribute}"}) do |label|
-            expect(label).to have_tag('span', text: 'Full name is required')
+        expect(subject).to have_tag("#error_person_#{attribute}.form-group-error") do
+          with_tag('label', text: /Full name/, with: {for: "person_#{attribute}"}) do
+            with_tag('span', text: 'Full name is required')
           end
         end
       end
@@ -166,8 +165,8 @@ RSpec.describe GovukElementsFormBuilder::FormBuilder do
             # a before block
             resource.valid?
 
-            expect(builder.send(method, attribute)).to have_tag("#error_person_#{attribute}.form-group-error") do |fge|
-              expect(fge).to have_tag('span', text: message)
+            expect(builder.send(method, attribute)).to have_tag("#error_person_#{attribute}.form-group-error") do
+              with_tag('span', text: message)
             end
 
           end
@@ -319,17 +318,17 @@ RSpec.describe GovukElementsFormBuilder::FormBuilder do
       subject {builder.radio_button_fieldset(:has_user_account)}
 
       specify 'outputs yes/no choices' do
-        expect(subject).to have_tag('.form-group > fieldset') do |fieldset|
-          expect(fieldset).to have_tag('div.multiple-choice > input', count: 2, with: {type: 'radio'})
-          expect(fieldset).to have_tag('input', with: {value: 'no'})
-          expect(fieldset).to have_tag('input', with: {value: 'yes'})
+        expect(subject).to have_tag('.form-group > fieldset') do
+          with_tag('div.multiple-choice > input', count: 2, with: {type: 'radio'})
+          with_tag('input', with: {value: 'no'})
+          with_tag('input', with: {value: 'yes'})
         end
       end
 
       specify 'yes/no choices have labels' do
-        expect(subject).to have_tag('.form-group > fieldset') do |fieldset|
-          expect(fieldset).to have_tag('label', text: 'Yes', with: {for: 'person_has_user_account_yes'})
-          expect(fieldset).to have_tag('label', text: 'No', with: {for: 'person_has_user_account_no'})
+        expect(subject).to have_tag('.form-group > fieldset') do
+          with_tag('label', text: 'Yes', with: {for: 'person_has_user_account_yes'})
+          with_tag('label', text: 'No', with: {for: 'person_has_user_account_no'})
         end
       end
 
@@ -373,8 +372,8 @@ RSpec.describe GovukElementsFormBuilder::FormBuilder do
       end
 
       specify 'the hidden panel should contain a text input' do
-        expect(subject).to have_tag(".panel.js-hidden") do |panel|
-          expect(panel).to have_tag('input.form-control', with: {
+        expect(subject).to have_tag(".panel.js-hidden") do
+          with_tag('input.form-control', with: {
             type: 'text',
             name: "person[#{other_input}]"
           })
@@ -382,8 +381,8 @@ RSpec.describe GovukElementsFormBuilder::FormBuilder do
       end
 
       specify "the hidden 'other' input should be labelled correctly" do
-        expect(subject).to have_tag(".panel.js-hidden") do |panel|
-          expect(panel).to have_tag('label.form-label', with: {
+        expect(subject).to have_tag(".panel.js-hidden") do
+          with_tag('label.form-label', with: {
             for: "person_#{other_input}"
           })
         end
@@ -477,8 +476,8 @@ RSpec.describe GovukElementsFormBuilder::FormBuilder do
 
     specify 'outputs checkboxes with labels' do
       expect(subject).to have_tag('div.form-group') do |form_group|
-        expect(form_group).to have_tag('input', with: {type: 'checkbox'}, count: waste_categories.size)
-        expect(form_group).to have_tag('label', count: waste_categories.size)
+        with_tag('input', with: {type: 'checkbox'}, count: waste_categories.size)
+        with_tag('label', count: waste_categories.size)
       end
     end
 
@@ -539,14 +538,14 @@ RSpec.describe GovukElementsFormBuilder::FormBuilder do
 
       specify 'should add a text field to checkboxes with associated text fields' do
         fields_with_hidden_panels.each do |fwhp|
-          expect(subject).to have_tag("div##{fwhp}_panel") do |panel|
+          expect(subject).to have_tag("div##{fwhp}_panel") do
 
             attributes = {
               type: 'text',
               name: "person[waste_transport_attributes][#{fwhp}_details]"
             }
 
-            expect(panel).to have_tag('div.panel.js-hidden input', with: attributes)
+            with_tag('div.panel.js-hidden input', with: attributes)
           end
         end
       end
@@ -591,9 +590,9 @@ RSpec.describe GovukElementsFormBuilder::FormBuilder do
     let(:input_container) {'div.form-group > fieldset > div.multiple-choice'}
 
     specify 'builds the legend, form label and hint correctly' do
-      expect(subject).to have_tag('div.form-group > fieldset > legend') do |legend|
-        expect(legend).to have_tag('span.form-label-bold', text: 'Gender')
-        expect(legend).to have_tag('span.form-hint', text: 'Select from these options')
+      expect(subject).to have_tag('div.form-group > fieldset > legend') do
+        with_tag('span.form-label-bold', text: 'Gender')
+        with_tag('span.form-hint', text: 'Select from these options')
       end
     end
 
@@ -634,9 +633,9 @@ RSpec.describe GovukElementsFormBuilder::FormBuilder do
     let(:input_container) {'div.form-group > fieldset > div.multiple-choice'}
 
     specify 'builds the legend, form label and hint correctly' do
-      expect(subject).to have_tag('div.form-group > fieldset > legend') do |legend|
-        expect(legend).to have_tag('span.form-label-bold', text: 'Gender')
-        expect(legend).to have_tag('span.form-hint', text: 'Select from these options')
+      expect(subject).to have_tag('div.form-group > fieldset > legend') do
+        with_tag('span.form-label-bold', text: 'Gender')
+        with_tag('span.form-hint', text: 'Select from these options')
       end
     end
 
@@ -671,9 +670,9 @@ RSpec.describe GovukElementsFormBuilder::FormBuilder do
 
       specify 'outputs a div containing select and label elements' do
 
-        expect(subject).to have_tag('div.form-group') do |div|
-          expect(div).to have_tag('label.form-label')
-          expect(div).to have_tag('select.form-control')
+        expect(subject).to have_tag('div.form-group') do
+          with_tag('label.form-label')
+          with_tag('select.form-control')
         end
 
       end
@@ -687,9 +686,9 @@ RSpec.describe GovukElementsFormBuilder::FormBuilder do
         selector = 'div.form-group > select#person_gender.form-control'
         attributes = {name: 'person[gender]'}
 
-        expect(subject).to have_tag(selector, with: attributes) do |select|
+        expect(subject).to have_tag(selector, with: attributes) do
           genders.each do |gender|
-            expect(select).to have_tag('option', with: {value: gender}, text: gender)
+            with_tag('option', with: {value: gender}, text: gender)
           end
         end
 
