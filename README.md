@@ -3,6 +3,16 @@ Build Status:
 
 Code Climate: <a href="https://codeclimate.com/github/ministryofjustice/govuk_elements_form_builder"><img src="https://codeclimate.com/github/ministryofjustice/govuk_elements_form_builder/badges/gpa.svg" /></a> <a href="https://codeclimate.com/github/ministryofjustice/govuk_elements_form_builder/coverage"><img src="https://codeclimate.com/github/ministryofjustice/govuk_elements_form_builder/badges/coverage.svg" /></a>
 
+# This gem is out of date
+
+For new projects built with the [GOV.UK Design System](https://design-system.service.gov.uk/)
+it is recommended that you use the [GOV.UK Design System FormBuilder](https://github.com/DFE-Digital/govuk_design_system_formbuilder)
+instead.
+
+If you're working on an older project where upgrading to the GOV.UK Design
+System isn't a viable option, don't worry. This gem will continue to receive
+bug fixes and accessibility improvements.
+
 # GovukElementsFormBuilder
 
 To build GOV.UK based services you need to use
